@@ -16,18 +16,29 @@ const Chat = () => {
   async function callNyanchat() {
     try {
       setIsRunning(true);
-      const response = await axios.get(
-        "http://127.0.0.1:8000/v1/nyan/nyanchat",
+      // const response = await axios.get(
+      //   "http://127.0.0.1:8000/v1/nyan/nyanchat",
+      //   {
+      //     params: {
+      //       prompt: prompt,
+      //     },
+      //   }
+      // );
+
+      const response = await axios.post(
+        "http://127.0.0.1:2020/chat/prompt",
         {
-          params: {
-            prompt: prompt,
-          },
+          query: prompt,
+          get_tts: false  // TTS에 대한 값을 처리하려면 값을 true 로 변경
         }
-      );
+      )
+
+      console.log(response)
+
       setIsRunning(false);
       setChatData((currentData) => [
         ...currentData,
-        { sender: "bot", content: response?.data?.response },
+        { sender: "bot", content: response?.data },
       ]);
     } catch (error) {
       // Handle errors here. If using AxiosError, you can extract more detailed info
@@ -96,7 +107,7 @@ const Chat = () => {
               />
             )}
             <div className="message max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl border p-4 rounded-lg ">
-              {message.content.split("\n").map((line, lineIndex) => {
+              {message.content?.split("\n").map((line, lineIndex) => {
                 return (
                   <p key={`chat-${chatIndex}-line-${lineIndex}`}>{line}</p>
                 );
