@@ -18,14 +18,11 @@ const Chat = () => {
   async function callNyanChat() {
     try {
       setIsRunning(true);
-      const response = await axios.get(
-        'http://127.0.0.1:5001/v1/nyan/nyanchat',
-        {
-          params: {
-            prompt: prompt,
-          },
+      const response = await axios.get('http://127.0.0.1:5001/api/', {
+        params: {
+          prompt: prompt,
         },
-      );
+      });
       setIsRunning(false);
       setChatData((currentData) => [
         ...currentData,
