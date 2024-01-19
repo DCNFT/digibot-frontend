@@ -22,6 +22,8 @@ const ChatMessage = ({
               src="/images/nyan.png"
               alt="Bot"
               className="w-12 h-12 rounded-full"
+              width={48}
+              height={48}
             />
           }
           <div className="message max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl border p-4 rounded-lg">
@@ -43,16 +45,22 @@ const ChatMessage = ({
           src="/images/nyan.png"
           alt="Bot"
           className="w-12 h-12 rounded-full"
+          width={48}
+          height={48}
         />
       )}
       <div className="message max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl border p-4 rounded-lg">
-        {message?.content}
+        {message?.content.split('\n').map((line, index) => (
+          <p key={index}>{line}</p>
+        ))}
       </div>
       {message?.sender === 'user' && (
         <Image
           src="/images/wk.jpg"
           alt="User"
           className="w-12 h-12 rounded-full"
+          width={48}
+          height={48}
         />
       )}
     </div>

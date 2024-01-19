@@ -1,5 +1,6 @@
 import { Message } from '@/views/chat';
 import { consumeReadableStream } from './consumeStream';
+import { CHAT_BOT_DEFAULT_ID, CHAT_USER_DEFAULT_ID } from '@/constants/default';
 
 export const processResponse = async (
   response: Response,
@@ -52,4 +53,18 @@ export const processResponse = async (
   } else {
     throw new Error('Response body is null');
   }
+};
+
+export const getBotLastId = (chatData: Message[]) => {
+  const lastBotMessage = chatData.findLast(
+    (chatMessage) => chatMessage.sender === 'bot',
+  );
+  return lastBotMessage ? lastBotMessage.id : CHAT_BOT_DEFAULT_ID;
+};
+
+export const getUserLastId = (chatData: Message[]) => {
+  const lastUserMessage = chatData.findLast(
+    (chatMessage) => chatMessage.sender === 'user',
+  );
+  return lastUserMessage ? lastUserMessage.id : CHAT_USER_DEFAULT_ID;
 };

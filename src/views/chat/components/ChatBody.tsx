@@ -23,9 +23,13 @@ const ChatBody = ({ chatData, isRunning }: ChatBodyProps) => {
       style={{ marginBottom: '4rem' }}
     >
       {chatData.map((message, index) => (
-        <ChatMessage key={`chat-message-${index}`} message={message} />
+        <ChatMessage
+          key={`chat-message-${index}`}
+          message={message}
+          isRunning={isRunning}
+        />
       ))}
-      <ChatMessage isLoader isRunning={isRunning} />
+      {/* <ChatMessage isLoader isRunning={isRunning} /> */}
 
       <div ref={messagesEndRef} />
     </div>
