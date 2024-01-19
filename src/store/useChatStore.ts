@@ -29,22 +29,22 @@ const initialState: State = {
 
 const useChatStore = create(
   devtools(
-    immer<State & Actions>((set) => ({
+    immer<State & Actions>((set, get) => ({
       ...initialState,
       reset: () => set(initialState),
       setPrompt: (prompt) => set({ prompt }),
       setIsRunning: (isRunning) => set({ isRunning }),
+
       setChatData: (chatData, lastChatMessageId, text) =>
-        chatData.map((chatMessage) => {
-          if (chatMessage.id === lastChatMessageId) {
-            console.log('hi');
-            // Immer를 사용하여 직접 객체를 수정
-            return {
-              ...chatMessage,
-              content: chatMessage.content + text,
-            };
+        set((state) => {
+          const chatMessage = state.chatData.find(
+            (chatMessage) => chatMessage.id === lastChatMessageId,
+          );
+          if (chatMessage) {
+            chatMessage.content += text;
           }
         }),
+
       setInsertChatData: (newMessage) =>
         set((state) => {
           state.chatData.push(newMessage);

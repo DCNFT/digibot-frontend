@@ -68,7 +68,10 @@ const Chat = () => {
             //     return chatMessage;
             //   }),
             // );
-            setChatData(chatData, lastChatMessageId, text);
+            // chatData.find(
+            //   (chatMessage) => chatMessage.id === lastChatMessageId,
+            // )?.content += text;
+            //setChatData(chatData, lastChatMessageId, text);
             // const chatDatas = chatData.map((chatMessage) => {
             //   if (chatMessage.id === lastChatMessageId) {
             //     const updatedChatMessage: Message = {
@@ -81,6 +84,7 @@ const Chat = () => {
             //   return chatMessage;
             // });
             // console.log('[seo] ', chatDatas);
+            setChatData(chatData, lastChatMessageId, text);
 
             return reader.read().then(processText);
           });
