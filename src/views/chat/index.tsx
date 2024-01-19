@@ -3,6 +3,7 @@ import ChatInput from './components/ChatInput';
 import ChatBody from './components/ChatBody';
 import { incrementLastNumber } from '@/lib/utils';
 import { getBotLastId, getUserLastId } from '@/lib/chat';
+import useChatStore from '@/store/useChatStore';
 
 export type Message = {
   id?: string;
@@ -11,9 +12,14 @@ export type Message = {
 };
 
 const Chat = () => {
-  const [prompt, setPrompt] = useState('');
-  const [isRunning, setIsRunning] = useState(false);
-  const [chatData, setChatData] = useState<Message[]>([]);
+  const prompt = useChatStore((state) => state.prompt);
+  const isRunning = useChatStore((state) => state.isRunning);
+  const chatData = useChatStore((state) => state.chatData);
+  const setChatData = useChatStore((state) => state.setChatData);
+  const setInsertChatData = useChatStore((state) => state.setInsertChatData);
+  const setPrompt = useChatStore((state) => state.setPrompt);
+  const setIsRunning = useChatStore((state) => state.setIsRunning);
+
   const ref = useRef(false);
   const [updateComplete, setUpdateComplete] = useState(false);
   let controller: AbortController | undefined;
@@ -23,7 +29,7 @@ const Chat = () => {
     controller = new AbortController();
     const { signal } = controller;
 
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/chat/prompt`, {
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/chat/stream`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -48,19 +54,34 @@ const Chat = () => {
             if (done) return;
 
             const text = decoder.decode(value, { stream: true });
-            setChatData((prev) =>
-              prev.map((chatMessage) => {
-                if (chatMessage.id === lastChatMessageId) {
-                  const updatedChatMessage: Message = {
-                    ...chatMessage,
-                    sender: 'bot',
-                    content: chatMessage.content + text,
-                  };
-                  return updatedChatMessage;
-                }
-                return chatMessage;
-              }),
-            );
+
+            // setChatData((prev) =>
+            //   prev.map((chatMessage) => {
+            //     if (chatMessage.id === lastChatMessageId) {
+            //       const updatedChatMessage: Message = {
+            //         ...chatMessage,
+            //         sender: 'bot',
+            //         content: chatMessage.content + text,
+            //       };
+            //       return updatedChatMessage;
+            //     }
+            //     return chatMessage;
+            //   }),
+            // );
+            setChatData(chatData, lastChatMessageId, text);
+            // const chatDatas = chatData.map((chatMessage) => {
+            //   if (chatMessage.id === lastChatMessageId) {
+            //     const updatedChatMessage: Message = {
+            //       ...chatMessage,
+            //       sender: 'bot',
+            //       content: chatMessage.content + text,
+            //     };
+            //     return updatedChatMessage;
+            //   }
+            //   return chatMessage;
+            // });
+            // console.log('[seo] ', chatDatas);
+
             return reader.read().then(processText);
           });
       })
@@ -97,11 +118,16 @@ const Chat = () => {
       : lastBotChatId;
 
     // 새로운 채팅 데이터 추가
-    setChatData((currentData) => [
-      ...currentData,
-      { sender: 'user', content: prompt, id: lastUserChatIdIncrease },
-      { sender: 'bot', content: '', id: lastBotChatIdIncrease },
-    ]);
+    setInsertChatData({
+      sender: 'user',
+      content: prompt,
+      id: lastUserChatIdIncrease,
+    });
+    setInsertChatData({
+      sender: 'bot',
+      content: '',
+      id: lastBotChatIdIncrease,
+    });
 
     setUpdateComplete(true); // 상태 업데이트 완료 플래그 설정
     ref.current = true; // 참조 플래그 업데이트

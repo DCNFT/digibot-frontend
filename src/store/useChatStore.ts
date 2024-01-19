@@ -1,25 +1,56 @@
+import { Message } from '@/views/chat';
 import { create } from 'zustand';
-import { immer } from 'zustand/middleware/immer';
 import { devtools } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
 
-interface ModalState {
-  onDismiss?: () => void;
-}
-interface ModalActions {
-  setOnDismiss: (onDismiss: () => void) => void;
-}
+type State = {
+  prompt: string;
+  isRunning: boolean;
+  chatData: Message[];
+};
 
-const initialState: ModalState = {};
+type Actions = {
+  reset: () => void;
+  setPrompt: (prompt: string) => void;
+  setIsRunning: (isRunning: boolean) => void;
+  setInsertChatData: (newMessage: Message) => void;
+  setChatData: (
+    chatData: Message[],
+    lastChatMessageId: string | undefined,
+    text: string,
+  ) => void;
+};
 
-export const useModalStore = create<ModalState & ModalActions>()(
+const initialState: State = {
+  prompt: '',
+  isRunning: false,
+  chatData: [],
+};
+
+const useChatStore = create(
   devtools(
-    immer((set) => ({
+    immer<State & Actions>((set) => ({
       ...initialState,
-      setOnDismiss(dismiss: () => void) {
+      reset: () => set(initialState),
+      setPrompt: (prompt) => set({ prompt }),
+      setIsRunning: (isRunning) => set({ isRunning }),
+      setChatData: (chatData, lastChatMessageId, text) =>
+        chatData.map((chatMessage) => {
+          if (chatMessage.id === lastChatMessageId) {
+            console.log('hi');
+            // Immer를 사용하여 직접 객체를 수정
+            return {
+              ...chatMessage,
+              content: chatMessage.content + text,
+            };
+          }
+        }),
+      setInsertChatData: (newMessage) =>
         set((state) => {
-          state.onDismiss = dismiss;
-        });
-      },
+          state.chatData.push(newMessage);
+        }),
     })),
   ),
 );
+
+export default useChatStore;
