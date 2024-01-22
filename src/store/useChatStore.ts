@@ -7,6 +7,7 @@ type State = {
   prompt: string;
   isRunning: boolean;
   chatData: Message[];
+  lastChatMessageId: string | undefined;
 };
 
 type Actions = {
@@ -23,12 +24,14 @@ type Actions = {
     lastChatMessageId: string | undefined,
     text: string,
   ) => void;
+  setLastChatMessageId: (lastChatMessageId: string | undefined) => void;
 };
 
 const initialState: State = {
   prompt: '',
   isRunning: false,
   chatData: [],
+  lastChatMessageId: undefined,
 };
 
 const useChatStore = create(
@@ -53,6 +56,7 @@ const useChatStore = create(
         set((state) => {
           state.chatData.push(newMessage);
         }),
+      setLastChatMessageId: (lastChatMessageId) => set({ lastChatMessageId }),
     })),
   ),
 );

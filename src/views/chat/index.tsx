@@ -9,6 +9,8 @@ import {
   processResponse,
 } from '@/lib/chat';
 import useChatStore from '@/store/useChatStore';
+import useToast from '@/hooks/useToast';
+import { set } from 'react-hook-form';
 
 export type Message = {
   id?: string;
@@ -27,22 +29,26 @@ const Chat = () => {
   const setIsRunning = useChatStore((state) => state.setIsRunning);
 
   const ref = useRef(false);
-
+  const setLastChatMessageId = useChatStore(
+    (state) => state.setLastChatMessageId,
+  );
+  const { enqueueErrorBar } = useToast();
   const [updateComplete, setUpdateComplete] = useState(false);
   let controller: AbortController | undefined;
 
   const handleSendMessage = async () => {
     setIsRunning(true);
     controller = new AbortController();
+    const lastChatMessageId = getBotLastId(chatData);
+    setLastChatMessageId(lastChatMessageId);
     try {
       const response = await fetchChatResponse(
-        `${process.env.NEXT_PUBLIC_BACKEND_API}/chat/stream`,
+        `${process.env.NEXT_PUBLIC_BACKEND_API}/chat/prompt`,
         { query: prompt },
         true,
         controller,
         setIsRunning,
       );
-      const lastChatMessageId = getBotLastId(chatData);
 
       const fullText = await processResponse(
         response,
@@ -53,8 +59,9 @@ const Chat = () => {
         lastChatMessageId,
       );
       setIsRunning(false);
-    } catch (e) {
+    } catch (e: any) {
       setIsRunning(false);
+      enqueueErrorBar(e.message);
     }
   };
 

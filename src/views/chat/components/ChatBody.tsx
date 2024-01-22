@@ -6,7 +6,7 @@ import Image from 'next/image';
 const ChatBody = () => {
   const chatData = useChatStore((state) => state.chatData);
   const isRunning = useChatStore((state) => state.isRunning);
-
+  const lastChatMessageId = useChatStore((state) => state.lastChatMessageId);
   const messagesEndRef = useRef<any>(null);
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -42,6 +42,7 @@ const ChatBody = () => {
       {chatData.map((message, index) => (
         <ChatMessage
           key={`chat-message-${index}`}
+          isLastChatMessage={lastChatMessageId === message.id}
           message={message}
           isRunning={isRunning}
         />
