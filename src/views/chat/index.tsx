@@ -10,11 +10,10 @@ import {
 } from '@/lib/chat';
 import useChatStore from '@/store/useChatStore';
 import useToast from '@/hooks/useToast';
-import { set } from 'react-hook-form';
 
 export type Message = {
   id?: string;
-  sender: 'user' | 'bot';
+  role: 'user' | 'assistant';
   content: string;
 };
 
@@ -36,6 +35,8 @@ const Chat = () => {
   const [updateComplete, setUpdateComplete] = useState(false);
   let controller: AbortController | undefined;
 
+  console.log('chatData = ', chatData);
+
   const handleSendMessage = async () => {
     setIsRunning(true);
     controller = new AbortController();
@@ -43,7 +44,8 @@ const Chat = () => {
     setLastChatMessageId(lastChatMessageId);
     try {
       const response = await fetchChatResponse(
-        `${process.env.NEXT_PUBLIC_BACKEND_API}/chat/prompt`,
+        //`${process.env.NEXT_PUBLIC_BACKEND_API}/chat/prompt`,
+        'http://211.176.9.214:32020/chat.prompt',
         { query: prompt },
         true,
         controller,
@@ -81,12 +83,12 @@ const Chat = () => {
 
     // 새로운 채팅 데이터 추가
     setInsertChatData({
-      sender: 'user',
+      role: 'user',
       content: prompt,
       id: lastUserChatIdIncrease,
     });
     setInsertChatData({
-      sender: 'bot',
+      role: 'assistant',
       content: '',
       id: lastBotChatIdIncrease,
     });

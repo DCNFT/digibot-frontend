@@ -18,10 +18,10 @@ const ChatMessage = ({
   return (
     <div
       className={`flex items-end gap-2 my-2 ${
-        message?.sender === 'user' ? 'justify-end' : ''
+        message?.role === 'user' ? 'justify-end' : ''
       }`}
     >
-      {message?.sender === 'bot' && (
+      {message?.role === 'assistant' && (
         <Image
           src="/images/nyan.png"
           alt="Bot"
@@ -31,7 +31,7 @@ const ChatMessage = ({
         />
       )}
       <div className="message max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl border p-4 rounded-lg">
-        {message?.sender === 'bot' &&
+        {message?.role === 'assistant' &&
           isRunning &&
           (message?.content.length === 0 || message?.content === undefined) &&
           isLastChatMessage && <div className="loader" />}
@@ -39,7 +39,7 @@ const ChatMessage = ({
           <p key={index}>{line}</p>
         ))}
       </div>
-      {message?.sender === 'user' && (
+      {message?.role === 'user' && (
         <Image
           src="/images/wk.jpg"
           alt="User"

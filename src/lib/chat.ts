@@ -76,14 +76,14 @@ export const processResponse = async (
 
 export const getBotLastId = (chatData: Message[]) => {
   const lastBotMessage = chatData.findLast(
-    (chatMessage) => chatMessage.sender === 'bot',
+    (chatMessage) => chatMessage.role === 'assistant',
   );
   return lastBotMessage ? lastBotMessage.id : CHAT_BOT_DEFAULT_ID;
 };
 
 export const getUserLastId = (chatData: Message[]) => {
   const lastUserMessage = chatData.findLast(
-    (chatMessage) => chatMessage.sender === 'user',
+    (chatMessage) => chatMessage.role === 'user',
   );
   return lastUserMessage ? lastUserMessage.id : CHAT_USER_DEFAULT_ID;
 };
