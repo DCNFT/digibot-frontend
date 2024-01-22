@@ -1,21 +1,22 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import useChatStore from '@/store/useChatStore';
 import { ReloadIcon } from '@radix-ui/react-icons';
 import { FormEvent } from 'react';
 
 type ChatInputProps = {
-  prompt: string;
   handleSubmit: (e: FormEvent) => void;
-  handleInput: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  isRunning: boolean;
 };
 
-const ChatInput = ({
-  prompt,
-  handleSubmit,
-  handleInput,
-  isRunning,
-}: ChatInputProps) => {
+const ChatInput = ({ handleSubmit }: ChatInputProps) => {
+  const prompt = useChatStore((state) => state.prompt);
+  const setPrompt = useChatStore((state) => state.setPrompt);
+  const isRunning = useChatStore((state) => state.isRunning);
+
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPrompt(e.target.value);
+  };
+
   return (
     <form
       onSubmit={handleSubmit}
