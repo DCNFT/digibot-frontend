@@ -2,14 +2,51 @@ import { Message } from '@/views/chat';
 import { consumeReadableStream } from './consumeStream';
 import { CHAT_BOT_DEFAULT_ID, CHAT_USER_DEFAULT_ID } from '@/constants/default';
 
-export const processResponse = async (
-  response: Response,
-  lastChatMessage: Message,
+export const fetchChatResponse = async (
+  url: string,
+  body: object,
   isHosted: boolean,
   controller: AbortController,
-  setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
-  setChatMessages: React.Dispatch<React.SetStateAction<Message[]>>,
-  setToolInUse: React.Dispatch<React.SetStateAction<'none' | 'retrieval'>>,
+  setIsRunning: (isRunning: boolean) => void,
+  // setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
+) => {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+    signal: controller.signal,
+  });
+
+  if (!response.ok) {
+    if (response.status === 404 && !isHosted) {
+      // toast.error(
+      //   'Model not found. Make sure you have it downloaded via Ollama.',
+      // );
+    }
+
+    const errorData = await response.json();
+    //toast.error(errorData.message);
+    console.log(errorData);
+    setIsRunning(false);
+    // setChatMessages((prevMessages) => prevMessages.slice(0, -2));
+  }
+
+  return response;
+};
+
+export const processResponse = async (
+  response: Response,
+  isHosted: boolean,
+  controller: AbortController,
+  //setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
+  setChatDataUpdateWithMessageId: (
+    lastChatMessageId: string | undefined,
+    text: string,
+  ) => void,
+  lastChatMessageId: string | undefined,
+  //setToolInUse: React.Dispatch<React.SetStateAction<'none' | 'retrieval'>>,
 ) => {
   let fullText = '';
   let contentToAdd = '';
@@ -18,33 +55,15 @@ export const processResponse = async (
     await consumeReadableStream(
       response.body,
       (chunk) => {
-        setFirstTokenReceived(true);
-        setToolInUse('none');
-
+        // setFirstTokenReceived(true);
+        // setToolInUse('none');
         try {
           contentToAdd = isHosted ? chunk : JSON.parse(chunk).message.content;
           fullText += contentToAdd;
         } catch (error) {
           console.error('Error parsing JSON:', error);
         }
-
-        // setChatMessages((prev) =>
-        //   prev.map((chatMessage) => {
-        //     if (chatMessage.message.id === lastChatMessage.message.id) {
-        //       const updatedChatMessage: Message = {
-        //         message: {
-        //           ...chatMessage.message,
-        //           content: chatMessage.message.content + contentToAdd,
-        //         },
-        //         fileItems: chatMessage.fileItems,
-        //       };
-
-        //       return updatedChatMessage;
-        //     }
-
-        //     return chatMessage;
-        //   }),
-        // );
+        setChatDataUpdateWithMessageId(lastChatMessageId, contentToAdd);
       },
       controller.signal,
     );

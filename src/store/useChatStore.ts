@@ -19,6 +19,10 @@ type Actions = {
     lastChatMessageId: string | undefined,
     text: string,
   ) => void;
+  setChatDataUpdateWithMessageId: (
+    lastChatMessageId: string | undefined,
+    text: string,
+  ) => void;
 };
 
 const initialState: State = {
@@ -34,17 +38,17 @@ const useChatStore = create(
       reset: () => set(initialState),
       setPrompt: (prompt) => set({ prompt }),
       setIsRunning: (isRunning) => set({ isRunning }),
-
-      setChatData: (chatData, lastChatMessageId, text) =>
+      setChatDataUpdateWithMessageId: (lastChatMessageId, text) =>
         set((state) => {
           const chatMessage = state.chatData.find(
             (chatMessage) => chatMessage.id === lastChatMessageId,
           );
-          if (chatMessage) {
-            chatMessage.content += text;
-          }
+          if (chatMessage) chatMessage.content += text;
         }),
-
+      setChatData: () =>
+        set((chatData) => {
+          chatData;
+        }),
       setInsertChatData: (newMessage) =>
         set((state) => {
           state.chatData.push(newMessage);
