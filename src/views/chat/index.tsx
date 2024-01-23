@@ -43,7 +43,7 @@ const systemSettings = (chatData: Message[], prompt: string | undefined) => {
       url: `${process.env.NEXT_PUBLIC_BACKEND_API}/chat/prompt`,
       setting: {
         menu_num: 4,
-        chat_history: chatData.map(({ id, ...rest }) => rest).slice(0, -1),
+        chat_history: chatData.map(({ id, ...rest }) => rest).slice(0, -2),
         query: prompt,
       },
     };
