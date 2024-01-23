@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import React from 'react';
-import { Message } from '..';
+import { Message } from '../..';
+import { MessageMarkdown } from './ChatMessageMarkdown';
 
 type ChatMessageProps = {
   message?: Message;
@@ -35,9 +36,7 @@ const ChatMessage = ({
           isRunning &&
           (message?.content.length === 0 || message?.content === undefined) &&
           isLastChatMessage && <div className="loader" />}
-        {message?.content.split('\n').map((line, index) => (
-          <p key={index}>{line}</p>
-        ))}
+        <MessageMarkdown content={message?.content} />
       </div>
       {message?.role === 'user' && (
         <Image

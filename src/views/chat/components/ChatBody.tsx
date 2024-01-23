@@ -1,4 +1,4 @@
-import ChatMessage from './ChatMessage';
+import ChatMessage from './chatMessage/ChatMessage';
 import { useEffect, useRef } from 'react';
 import useChatStore from '@/store/useChatStore';
 import Image from 'next/image';

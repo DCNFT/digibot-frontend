@@ -1,8 +1,8 @@
 import { CHAT_SETTING_LIMITS } from '@/lib/chat-setting-limits';
-import {
-  checkApiKey,
-  getServerProfile,
-} from '@/lib/server/server-chat-helpers';
+// import {
+//   checkApiKey,
+//   getServerProfile,
+// } from '@/lib/server/server-chat-helpers';
 import { ChatSettings } from '@/types';
 import { OpenAIStream, StreamingTextResponse } from 'ai';
 import { ServerRuntime } from 'next';
@@ -18,15 +18,14 @@ export async function POST(request: Request) {
     messages: any[];
   };
 
-  console.log('messages =', messages);
   try {
-    const profile = await getServerProfile();
-
-    checkApiKey(profile.openai_api_key, 'OpenAI');
+    // const profile = await getServerProfile();
+    // checkApiKey(profile.openai_api_key, 'OpenAI');
 
     const openai = new OpenAI({
-      apiKey: profile.openai_api_key || '',
-      organization: profile.openai_organization_id,
+      apiKey: '' || '', // insert key here
+      //apiKey: profile.openai_api_key || '',
+      //organization: profile.openai_organization_id,
     });
 
     const response = await openai.chat.completions.create({
