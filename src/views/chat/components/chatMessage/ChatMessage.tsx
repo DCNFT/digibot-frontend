@@ -1,7 +1,8 @@
 import Image from 'next/image';
 import React from 'react';
-import { Message } from '../..';
+
 import { MessageMarkdown } from './ChatMessageMarkdown';
+import { Message } from '@/types';
 
 type ChatMessageProps = {
   message?: Message;
@@ -24,7 +25,7 @@ const ChatMessage = ({
     >
       {message?.role === 'assistant' && (
         <Image
-          src="/images/nyan.png"
+          src="/images/XD_BOT.jpg"
           alt="Bot"
           className="w-12 h-12 rounded-full"
           width={48}
@@ -38,6 +39,7 @@ const ChatMessage = ({
           isLastChatMessage && <div className="loader" />}
         <MessageMarkdown content={message?.content} />
       </div>
+
       {message?.role === 'user' && (
         <Image
           src="/images/wk.jpg"

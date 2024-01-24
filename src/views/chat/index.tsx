@@ -7,48 +7,11 @@ import {
   getBotLastId,
   getUserLastId,
   processResponse,
+  systemSettings,
 } from '@/lib/chat';
 import useChatStore from '@/store/useChatStore';
 import useToast from '@/hooks/useToast';
 
-export type Message = {
-  id?: string;
-  role: 'user' | 'assistant';
-  content: string;
-};
-const USE_OPEN_AI_SERVER = false;
-
-const systemSettings = (chatData: Message[], prompt: string | undefined) => {
-  if (USE_OPEN_AI_SERVER)
-    return {
-      url: '/api/chat/openai',
-      setting: {
-        chatSettings: {
-          contextLength: 4096,
-          embeddingsProvider: 'openai',
-          includeProfileContext: true,
-          includeWorkspaceInstructions: true,
-          model: 'gpt-3.5-turbo-1106',
-          prompt: 'You are a friendly, helpful AI assistant.',
-          temperature: 0.5,
-        },
-        menuNum: 4,
-        messages: chatData.map(({ id, ...rest }) => rest).slice(0, -1),
-        query: prompt,
-      },
-    };
-
-  if (!USE_OPEN_AI_SERVER) {
-    return {
-      url: `${process.env.NEXT_PUBLIC_BACKEND_API}/chat/prompt`,
-      setting: {
-        menu_num: 4,
-        chat_history: chatData.map(({ id, ...rest }) => rest).slice(0, -2),
-        query: prompt,
-      },
-    };
-  }
-};
 const Chat = () => {
   const prompt = useChatStore((state) => state.prompt);
   const chatData = useChatStore((state) => state.chatData);
@@ -71,8 +34,8 @@ const Chat = () => {
     setIsRunning(true);
     controller = new AbortController();
     const lastChatMessageId = getBotLastId(chatData);
+
     setLastChatMessageId(lastChatMessageId);
-    console.log(chatData.map(({ id, ...rest }) => rest).slice(0, -1));
     const setting = systemSettings(chatData, prompt);
     const url = setting?.url as string;
     const params = setting?.setting as object;
@@ -138,6 +101,28 @@ const Chat = () => {
       setPrompt(''); // 입력란 초기화
     }
   }, [updateComplete]);
+
+  //   ------------------------------------
+  // Step 1) F/E 인사 메시지 출력
+  // ------------------------------------
+  // 안녕하세요? 디지봇입니다.
+  // 도움 받고자 하는 항목을 입력해주세요.
+  // 단, 항목은 "1" 과 같이 숫자 형태로 입력해주세요.
+
+  //  1. 경조금 문의
+  //  2. 복지 및 포상 문의
+  //  3. 여비 문의
+  //  4. 카페테리아 문의
+  //  5. 그 외
+
+  // > user : 4
+
+  // ------------------------------------
+  // Step 2) 사용자가 선택한 번호에 따른 추가 메시지 출력
+  // ------------------------------------
+  // 카페테리아 문의와 관련 되어 무엇을 도와드릴까요?
+
+  // > user : 내가 2018년 10월 입사했는데 얼마 받을수있어?
 
   return (
     <div className="flex flex-col h-screen">
