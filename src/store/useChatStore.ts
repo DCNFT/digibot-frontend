@@ -8,6 +8,7 @@ type State = {
   isRunning: boolean;
   chatData: Message[];
   lastChatMessageId: string | undefined;
+  menuNum: number;
 };
 
 type Actions = {
@@ -15,16 +16,13 @@ type Actions = {
   setPrompt: (prompt: string) => void;
   setIsRunning: (isRunning: boolean) => void;
   setInsertChatData: (newMessage: Message) => void;
-  setChatData: (
-    chatData: Message[],
-    lastChatMessageId: string | undefined,
-    text: string,
-  ) => void;
+  setChatData: (chatData: Message[]) => void;
   setChatDataUpdateWithMessageId: (
     lastChatMessageId: string | undefined,
     text: string,
   ) => void;
   setLastChatMessageId: (lastChatMessageId: string | undefined) => void;
+  setMenuNum: (menuNum: number) => void;
 };
 
 const initialState: State = {
@@ -32,6 +30,7 @@ const initialState: State = {
   isRunning: false,
   chatData: [],
   lastChatMessageId: undefined,
+  menuNum: 5,
 };
 
 const useChatStore = create(
@@ -48,15 +47,13 @@ const useChatStore = create(
           );
           if (chatMessage) chatMessage.content += text;
         }),
-      setChatData: () =>
-        set((chatData) => {
-          chatData;
-        }),
+      setChatData: (chatData) => set({ chatData }),
       setInsertChatData: (newMessage) =>
         set((state) => {
           state.chatData.push(newMessage);
         }),
       setLastChatMessageId: (lastChatMessageId) => set({ lastChatMessageId }),
+      setMenuNum: (menuNum) => set({ menuNum }),
     })),
   ),
 );

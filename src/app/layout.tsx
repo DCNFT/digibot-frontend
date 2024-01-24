@@ -32,7 +32,7 @@ export default function RootLayout({
       >
         <Providers defaultTheme="white" attribute="class">
           <ToastContainer />
-          <main className="flex flex-col min-h-screen  md:px-8 lg:px-12 xl:px-16 mx-auto">
+          <main className="bg-background text-foreground flex h-screen flex-col items-center">
             {children}
           </main>
         </Providers>

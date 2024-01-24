@@ -1,4 +1,4 @@
-import { Message } from '@/views/chat';
+import { Message } from '@/types';
 import { consumeReadableStream } from './consumeStream';
 import { CHAT_BOT_DEFAULT_ID, CHAT_USER_DEFAULT_ID } from '@/constants/default';
 
@@ -92,6 +92,7 @@ const USE_OPEN_AI_SERVER = false;
 export const systemSettings = (
   chatData: Message[],
   prompt: string | undefined,
+  menuNum: number,
 ) => {
   if (USE_OPEN_AI_SERVER)
     return {
@@ -116,7 +117,7 @@ export const systemSettings = (
     return {
       url: `${process.env.NEXT_PUBLIC_BACKEND_API}/chat/prompt`,
       setting: {
-        menu_num: 4,
+        menu_num: menuNum || 5,
         chat_history: chatData.map(({ id, ...rest }) => rest).slice(0, -2),
         query: prompt,
       },
