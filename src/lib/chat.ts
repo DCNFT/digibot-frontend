@@ -87,3 +87,39 @@ export const getUserLastId = (chatData: Message[]) => {
   );
   return lastUserMessage ? lastUserMessage.id : CHAT_USER_DEFAULT_ID;
 };
+
+const USE_OPEN_AI_SERVER = false;
+export const systemSettings = (
+  chatData: Message[],
+  prompt: string | undefined,
+) => {
+  if (USE_OPEN_AI_SERVER)
+    return {
+      url: '/api/chat/openai',
+      setting: {
+        chatSettings: {
+          contextLength: 4096,
+          embeddingsProvider: 'openai',
+          includeProfileContext: true,
+          includeWorkspaceInstructions: true,
+          model: 'gpt-3.5-turbo-1106',
+          prompt: 'You are a friendly, helpful AI assistant.',
+          temperature: 0.5,
+        },
+        menuNum: 4,
+        messages: chatData.map(({ id, ...rest }) => rest).slice(0, -1),
+        query: prompt,
+      },
+    };
+
+  if (!USE_OPEN_AI_SERVER) {
+    return {
+      url: `${process.env.NEXT_PUBLIC_BACKEND_API}/chat/prompt`,
+      setting: {
+        menu_num: 4,
+        chat_history: chatData.map(({ id, ...rest }) => rest).slice(0, -2),
+        query: prompt,
+      },
+    };
+  }
+};
