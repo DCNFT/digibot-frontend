@@ -33,7 +33,8 @@ const AppBar = () => {
     `hover:bg-blue-200 ${menuNum === number ? 'bg-blue-500' : ''}`;
 
   const handleLog = () => {
-    console.log(chatData.map(({ id, ...rest }) => rest));
+    //console.log(chatData.map(({ id, ...rest }) => rest));
+    console.log(chatData);
     copyToClipboard(JSON.stringify(chatData.map(({ id, ...rest }) => rest)));
     enqueueInfoBar('복사가 완료되었습니다.');
   };
@@ -54,7 +55,6 @@ const AppBar = () => {
         </div>
         <BannerTitle />
         <Button onClick={handleLog}>console and copy chatHistory</Button>
-        <Button onClick={handleLog}>handleLog</Button>
       </div>
     </div>
   );

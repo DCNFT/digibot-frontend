@@ -16,14 +16,13 @@ const ChatMessage = ({
   isRunning,
   isLastChatMessage,
 }: ChatMessageProps) => {
-  console.log(isLastChatMessage);
   return (
     <div
       className={`flex items-end gap-2 my-2 ${
         message?.role === 'user' ? 'justify-end' : ''
       }`}
     >
-      {message?.role === 'assistant' && (
+      {(message?.role === 'assistant' || message?.role === 'system') && (
         <Image
           src="/images/XD_BOT.jpg"
           alt="Bot"
@@ -33,7 +32,7 @@ const ChatMessage = ({
         />
       )}
       <div className="message max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl border p-4 rounded-lg">
-        {message?.role === 'assistant' &&
+        {(message?.role === 'assistant' || message?.role === 'system') &&
           isRunning &&
           (message?.content.length === 0 || message?.content === undefined) &&
           isLastChatMessage && <div className="loader" />}
