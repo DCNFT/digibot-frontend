@@ -1,6 +1,12 @@
 // import { Tables } from '@/supabase/types';
 import { LLMID } from '.';
 
+export type Message = {
+  id?: string;
+  role: 'user' | 'assistant';
+  content: string;
+};
+
 export interface ChatSettings {
   model: LLMID;
   prompt: string;

@@ -1,5 +1,6 @@
-"use client";
-import Chat from "@/views/chat";
+'use client';
+import Chat from '@/views/chat';
+
 export default function HomePage() {
   return (
     <main className="">
