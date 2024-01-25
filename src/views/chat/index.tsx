@@ -97,9 +97,7 @@ const Chat = () => {
   };
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
     const { lastUserChatIdIncrease, lastBotChatIdIncrease } = getIds();
-
     console.log(lastBotChatIdIncrease);
     if (prompt === '/명령어') {
       handleCommandsInput();

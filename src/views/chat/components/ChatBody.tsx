@@ -47,6 +47,7 @@ const ChatBody = () => {
   return (
     <div className="flex w-full h-full flex-col overflow-auto border-b">
       <div className="flex flex-col w-full justify-center items-center">
+        {/* <Intro chatData={chatData} /> */}
         {chatData.map((message, index) => (
           <ChatMessage
             key={`chat-message-${index}`}
@@ -57,7 +58,6 @@ const ChatBody = () => {
         ))}
       </div>
       {/* <div className="relative flex w-[300px] flex-col py-6 sm:w-[400px] md:w-[500px] lg:w-[600px] xl:w-[700px]"> */}
-      {/* <Intro chatData={chatData} /> */}
 
       {/* </div> */}
       <div ref={messagesEndRef} />

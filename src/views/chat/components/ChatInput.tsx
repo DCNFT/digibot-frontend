@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { TextareaAutosize } from '@/components/ui/textareaAutosize';
 import useChatStore from '@/store/useChatStore';
 import { ReloadIcon } from '@radix-ui/react-icons';
-import { FormEvent, useRef, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 
 type ChatInputProps = {
   handleSubmit: (e: FormEvent) => void;
@@ -17,10 +17,11 @@ const ChatInput = ({ handleSubmit }: ChatInputProps) => {
   const handleInput = (value: string) => {
     setPrompt(value);
   };
+
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
   const [isTyping, setIsTyping] = useState(false);
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (!isTyping && event.key === 'Enter' && !event.shiftKey) {
+    if (!isTyping && event.key === 'Enter' && !event.shiftKey && !isRunning) {
       event.preventDefault();
       //setIsPromptPickerOpen(false);
       handleSubmit(event);
@@ -47,6 +48,25 @@ const ChatInput = ({ handleSubmit }: ChatInputProps) => {
     //   setFocusFile(!focusFile);
     // }
   };
+  useEffect(() => {
+    const textarea = chatInputRef.current;
+    if (textarea) {
+      const handleCompositionStart = () => setIsTyping(true);
+      const handleCompositionEnd = () => setIsTyping(false);
+
+      textarea.addEventListener('compositionstart', handleCompositionStart);
+      textarea.addEventListener('compositionend', handleCompositionEnd);
+
+      return () => {
+        textarea.removeEventListener(
+          'compositionstart',
+          handleCompositionStart,
+        );
+        textarea.removeEventListener('compositionend', handleCompositionEnd);
+      };
+    }
+  }, [chatInputRef]);
+
   return (
     <div className="relative w-[300px] items-end pb-8 pt-5 sm:w-[400px] md:w-[500px] lg:w-[660px] xl:w-[800px]">
       {/* <form onSubmit={handleSubmit} className="" style={{ height: '4rem' }}> */}

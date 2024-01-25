@@ -17,6 +17,10 @@ export const MENU_DATA = [
   },
   {
     menu_id: '5',
+    menu_name: '리조트 문의',
+  },
+  {
+    menu_id: '6',
     menu_name: 'Ordinary',
   },
 ];
