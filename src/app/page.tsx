@@ -4,11 +4,10 @@ import Chat from '@/views/chat';
 
 export default function HomePage() {
   return (
-    <>
-      <main className="flex flex-col h-full w-full">
-        <AppBar />
+    <div className="flex h-full w-full">
+      <div className="bg-muted/50 flex grow flex-col">
         <Chat />
-      </main>
-    </>
+      </div>
+    </div>
   );
 }

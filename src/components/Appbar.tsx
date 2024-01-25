@@ -40,10 +40,10 @@ const AppBar = () => {
   };
 
   return (
-    <div className="flex bg:white max-h-[180px] min-h-[180px] w-full items-center justify-center border-b-2 px-20 font-bold">
+    <div className="flex bg:white max-h-[60px] min-h-[60px] w-full items-center justify-center border-b-2 px-20 font-bold">
       <div className="flex flex-col gap-2">
         <div className="flex gap-3">
-          {Array.from({ length: 5 }, (_, i) => (
+          {/* {Array.from({ length: 5 }, (_, i) => (
             <Button
               key={i + 1}
               className={buttonStyle(i + 1)}
@@ -51,10 +51,10 @@ const AppBar = () => {
             >
               {i + 1}
             </Button>
-          ))}
+          ))} */}
         </div>
         <BannerTitle />
-        <Button onClick={handleLog}>console and copy chatHistory</Button>
+        {/* <Button onClick={handleLog}>console and copy chatHistory</Button> */}
       </div>
     </div>
   );
