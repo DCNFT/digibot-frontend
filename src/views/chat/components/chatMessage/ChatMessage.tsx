@@ -17,37 +17,39 @@ const ChatMessage = ({
   isLastChatMessage,
 }: ChatMessageProps) => {
   return (
-    <div
-      className={`flex items-end gap-2 my-2 ${
-        message?.role === 'user' ? 'justify-end' : ''
-      }`}
-    >
-      {(message?.role === 'assistant' || message?.role === 'system') && (
-        <Image
-          src="/images/XD_BOT.jpg"
-          alt="Bot"
-          className="w-12 h-12 rounded-full"
-          width={48}
-          height={48}
-        />
-      )}
-      <div className="message max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl border p-4 rounded-lg">
-        {(message?.role === 'assistant' || message?.role === 'system') &&
-          isRunning &&
-          (message?.content.length === 0 || message?.content === undefined) &&
-          isLastChatMessage && <div className="loader" />}
-        <MessageMarkdown content={message?.content} />
-      </div>
+    <div className="relative flex w-[300px] flex-col py-6 sm:w-[400px] md:w-[500px] lg:w-[600px] xl:w-[700px]">
+      <div
+        className={`flex items-end gap-2 my-2 ${
+          message?.role === 'user' ? 'justify-end' : ''
+        }`}
+      >
+        {(message?.role === 'assistant' || message?.role === 'system') && (
+          <Image
+            src="/images/XD_BOT.jpg"
+            alt="Bot"
+            className="w-12 h-12 rounded-full"
+            width={48}
+            height={48}
+          />
+        )}
+        <div className="message max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl border p-4 rounded-lg">
+          {(message?.role === 'assistant' || message?.role === 'system') &&
+            isRunning &&
+            (message?.content.length === 0 || message?.content === undefined) &&
+            isLastChatMessage && <div className="loader" />}
+          <MessageMarkdown content={message?.content} />
+        </div>
 
-      {message?.role === 'user' && (
-        <Image
-          src="/images/wk.jpg"
-          alt="User"
-          className="w-12 h-12 rounded-full"
-          width={48}
-          height={48}
-        />
-      )}
+        {message?.role === 'user' && (
+          <Image
+            src="/images/wk.jpg"
+            alt="User"
+            className="w-12 h-12 rounded-full"
+            width={48}
+            height={48}
+          />
+        )}
+      </div>
     </div>
   );
 };

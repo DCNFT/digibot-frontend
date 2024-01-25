@@ -15,6 +15,7 @@ import useToast from '@/hooks/useToast';
 import { COMMAND_LIST, MENU_DATA } from './data';
 import { Message } from '@/types/chat';
 import { v4 as uuidv4 } from 'uuid';
+import AppBar from '@/components/Appbar';
 
 const Chat = () => {
   const prompt = useChatStore((state) => state.prompt);
@@ -165,7 +166,8 @@ const Chat = () => {
   }, [updateComplete]);
 
   return (
-    <div className="flex size-full flex-col overflow-auto">
+    <div className="relative flex h-full flex-col items-center">
+      <AppBar />
       <ChatBody />
       <ChatInput handleSubmit={handleSubmit} />
     </div>
