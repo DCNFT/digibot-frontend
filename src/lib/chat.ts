@@ -1,6 +1,10 @@
 import { Message } from '@/types';
 import { consumeReadableStream } from './consumeStream';
-import { CHAT_BOT_DEFAULT_ID, CHAT_USER_DEFAULT_ID } from '@/constants/default';
+import {
+  CHAT_BOT_DEFAULT_ID,
+  CHAT_USER_DEFAULT_ID,
+  SYSTEM_MESSAGE,
+} from '@/constants/default';
 import { v4 as uuidv4 } from 'uuid';
 export const fetchChatResponse = async (
   url: string,
@@ -131,8 +135,7 @@ export const systemSettings = (
 export const getDefaultSystemMessage = () => {
   return {
     role: 'system',
-    content:
-      "안녕하세요? 디지봇입니다.\n도움 받고자 하는 항목을 입력해주세요.\n단, 항목은 '1' 과 같이 숫자 형태로 입력해주세요.\n1. 경조금 문의\n2. 복지 및 포상 문의\n3. 여비 문의\n4. 카페테리아 문의\n5. 그 외 질문\n",
+    content: SYSTEM_MESSAGE,
     id: uuidv4(),
   };
 };
