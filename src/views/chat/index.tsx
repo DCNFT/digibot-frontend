@@ -134,6 +134,7 @@ const Chat = () => {
         content: '잘못 선택하셧습니다. 다시 선택해주세요.',
         id: uuidv4(),
       });
+
       setPrompt(''); // 입력란 초기화
       return;
     }
