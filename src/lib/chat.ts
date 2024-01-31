@@ -6,6 +6,7 @@ import {
   SYSTEM_MESSAGE,
 } from '@/constants/default';
 import { v4 as uuidv4 } from 'uuid';
+import { consumeAudioStream } from './consumeAudioStream';
 export const fetchChatResponse = async (
   url: string,
   body: object,
@@ -56,9 +57,12 @@ export const processResponse = async (
   let contentToAdd = '';
 
   if (response.body) {
-    await consumeReadableStream(
+    await consumeAudioStream(
       response.body,
-      (chunk) => {
+      (chunk: any) => {
+        // const audioBlob = chunk.blob();
+        // const url = URL.createObjectURL(audioBlob);
+        console.log('url ', url);
         // setFirstTokenReceived(true);
         // setToolInUse('none');
         try {
@@ -97,7 +101,22 @@ export const systemSettings = (
   chatData: Message[],
   prompt: string | undefined,
   menuNum: number,
+  isTest: boolean,
+  isLocalServer = false,
 ) => {
+  if (isLocalServer)
+    return {
+      url: `${process.env.NEXT_PUBLIC_BACKEND_API_LOCAL}/v1/nyan/prompt`,
+      setting: {
+        menu_num: menuNum || 5,
+        chat_history: chatData
+          .filter(({ role }) => role !== 'system') // 'system' 역할을 제외
+          .map(({ id, ...rest }) => rest) // id 제외
+          .slice(0, -2),
+        query: prompt,
+      },
+    };
+
   if (USE_OPEN_AI_SERVER)
     return {
       url: '/api/chat/openai',
@@ -117,9 +136,9 @@ export const systemSettings = (
       },
     };
 
-  if (!USE_OPEN_AI_SERVER) {
+  if (!USE_OPEN_AI_SERVER && !isTest) {
     return {
-      url: `${process.env.NEXT_PUBLIC_BACKEND_API}/v1/nyan/prompt`,
+      url: `${process.env.NEXT_PUBLIC_BACKEND_API}/chat/prompt`,
       setting: {
         menu_num: menuNum || 5,
         chat_history: chatData
@@ -130,6 +149,18 @@ export const systemSettings = (
       },
     };
   }
+
+  return {
+    url: `${process.env.NEXT_PUBLIC_BACKEND_API}/chat/stream_audio`,
+    setting: {
+      menu_num: menuNum || 5,
+      chat_history: chatData
+        .filter(({ role }) => role !== 'system') // 'system' 역할을 제외
+        .map(({ id, ...rest }) => rest) // id 제외
+        .slice(0, -2),
+      text: prompt,
+    },
+  };
 };
 
 export const getDefaultSystemMessage = () => {

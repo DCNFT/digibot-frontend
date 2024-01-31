@@ -16,6 +16,7 @@ import { COMMAND_LIST, MENU_DATA } from '@/views/chat/data';
 import { Message } from '@/types/chat';
 import { v4 as uuidv4 } from 'uuid';
 import AppBar from '@/components/Appbar';
+import { consumeAudioStream } from '@/lib/consumeAudioStream';
 
 const Labs = () => {
   const prompt = useChatStore((state) => state.prompt);
@@ -37,6 +38,7 @@ const Labs = () => {
   const setMenuNum = useChatStore((state) => state.setMenuNum);
   const isFlowChat = useChatStore((state) => state.isFlowChat);
   const setIsFlowChat = useChatStore((state) => state.setIsFlowChat);
+  const audioRef = useRef<any>(null);
 
   const handleSendMessage = async () => {
     setIsRunning(true);
@@ -44,7 +46,8 @@ const Labs = () => {
     const lastChatMessageId = getBotLastId(chatData);
 
     setLastChatMessageId(lastChatMessageId);
-    const setting = systemSettings(chatData, prompt, menuNum);
+    const isTest = true;
+    const setting = systemSettings(chatData, prompt, menuNum, isTest);
     const url = setting?.url as string;
     const params = setting?.setting as object;
     try {
@@ -55,16 +58,22 @@ const Labs = () => {
         controller,
         setIsRunning,
       );
-      console.log(response);
-
-      const fullText = await processResponse(
-        response,
-        true,
-        controller,
-        //setFirstTokenReceived,
-        setChatDataUpdateWithMessageId,
-        lastChatMessageId,
+      consumeAudioStream(
+        response.body ?? new ReadableStream<Uint8Array>(),
+        (audioBlob) => {
+          audioRef.current.src = URL.createObjectURL(audioBlob);
+          audioRef?.current.play();
+        },
+        controller.signal,
       );
+      // const fullText = await processResponse(
+      //   response,
+      //   true,
+      //   controller,
+      //   //setFirstTokenReceived,
+      //   setChatDataUpdateWithMessageId,
+      //   lastChatMessageId,
+      // );
       setIsRunning(false);
     } catch (e: any) {
       setIsRunning(false);
@@ -168,6 +177,7 @@ const Labs = () => {
       <AppBar />
       <ChatBody />
       <ChatInput handleSubmit={handleSubmit} />
+      <audio ref={audioRef} controls />
     </div>
   );
 };
