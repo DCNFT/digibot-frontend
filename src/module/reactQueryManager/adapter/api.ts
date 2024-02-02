@@ -14,7 +14,7 @@ export const api = {
   post: <T, S>(url: string, data: T | S, params?: RequestConfigType) =>
     httpService.post<ResponseType<S>, T | S>(url, data, {
       ...params,
-      token,
+      // token,
     }),
 
   patch: <T, S>(url: string, data: T | S, params?: RequestConfigType) =>

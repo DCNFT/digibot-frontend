@@ -119,7 +119,7 @@ export const systemSettings = (
 
   if (!USE_OPEN_AI_SERVER) {
     return {
-      url: `${process.env.NEXT_PUBLIC_BACKEND_API}/chat/prompt`,
+      url: `${process.env.NEXT_PUBLIC_BACKEND_API}/chat/daou`,
       setting: {
         menu_num: menuNum || 5,
         chat_history: chatData
