@@ -4,6 +4,7 @@ import {
   CHAT_BOT_DEFAULT_ID,
   CHAT_USER_DEFAULT_ID,
   SYSTEM_MESSAGE,
+  SYSTEM_MESSAGE_LAB,
 } from '@/constants/default';
 import { v4 as uuidv4 } from 'uuid';
 export const fetchChatResponse = async (
@@ -12,12 +13,14 @@ export const fetchChatResponse = async (
   isHosted: boolean,
   controller: AbortController,
   setIsRunning: (isRunning: boolean) => void,
+  header?: object,
   // setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
 ) => {
   const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      ...header,
     },
     body: JSON.stringify(body),
     signal: controller.signal,
@@ -132,10 +135,10 @@ export const systemSettings = (
   }
 };
 
-export const getDefaultSystemMessage = () => {
+export const getDefaultSystemMessage = (isLab = false) => {
   return {
     role: 'system',
-    content: SYSTEM_MESSAGE,
+    content: isLab ? SYSTEM_MESSAGE_LAB : SYSTEM_MESSAGE,
     id: uuidv4(),
   };
 };

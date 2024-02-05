@@ -40,6 +40,7 @@ const Chat = () => {
 
   const handleSendMessage = async () => {
     setIsRunning(true);
+    console.log('prompt= ', prompt);
     controller = new AbortController();
     const lastChatMessageId = getBotLastId(chatData);
 
@@ -170,5 +171,6 @@ const Chat = () => {
       <ChatInput handleSubmit={handleSubmit} />
     </div>
   );
+  ``;
 };
 export default Chat;

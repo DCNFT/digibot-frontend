@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { TextareaAutosize } from '@/components/ui/textareaAutosize';
-import useChatStore from '@/store/useChatStore';
+import useChatStoreLab from '@/store/useChatStoreLab';
 import { ReloadIcon } from '@radix-ui/react-icons';
 import { FormEvent, useEffect, useRef, useState } from 'react';
 
@@ -9,9 +10,9 @@ type ChatInputProps = {
 };
 
 const ChatInput = ({ handleSubmit }: ChatInputProps) => {
-  const prompt = useChatStore((state) => state.prompt);
-  const setPrompt = useChatStore((state) => state.setPrompt);
-  const isRunning = useChatStore((state) => state.isRunning);
+  const prompt = useChatStoreLab((state) => state.prompt);
+  const setPrompt = useChatStoreLab((state) => state.setPrompt);
+  const isRunning = useChatStoreLab((state) => state.isRunning);
 
   const handleInput = (value: string) => {
     setPrompt(value);

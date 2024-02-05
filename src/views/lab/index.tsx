@@ -1,6 +1,6 @@
 import { useState, FormEvent, useRef, useEffect } from 'react';
-import ChatInput from '@/views/chat/components/ChatInput';
-import ChatBody from '@/views/chat/components/ChatBody';
+import ChatInput from '@/views/lab/components/ChatInput';
+import ChatBody from '@/views/lab/components/ChatBody';
 import { incrementLastNumber } from '@/lib/utils';
 import {
   fetchChatResponse,
@@ -10,44 +10,46 @@ import {
   processResponse,
   systemSettings,
 } from '@/lib/chat';
-import useChatStore from '@/store/useChatStore';
+import useChatStoreLab from '@/store/useChatStoreLab';
 import useToast from '@/hooks/useToast';
-import { COMMAND_LIST, MENU_DATA, MENU_DATA_LAB } from '@/views/chat/data';
+import { COMMAND_LIST, MENU_DATA_LAB } from '@/views/chat/data';
 import { Message } from '@/types/chat';
 import { v4 as uuidv4 } from 'uuid';
 import AppBar from '@/components/Appbar';
-import Login from './components/Login';
-
 const ChatLab = () => {
-  const prompt = useChatStore((state) => state.prompt);
-  const chatData = useChatStore((state) => state.chatData);
-  const setChatDataUpdateWithMessageId = useChatStore(
+  const prompt = useChatStoreLab((state) => state.prompt);
+  const chatData = useChatStoreLab((state) => state.chatData);
+  const setChatDataUpdateWithMessageId = useChatStoreLab(
     (state) => state.setChatDataUpdateWithMessageId,
   );
-  const setInsertChatData = useChatStore((state) => state.setInsertChatData);
-  const setPrompt = useChatStore((state) => state.setPrompt);
-  const setIsRunning = useChatStore((state) => state.setIsRunning);
+  const setInsertChatData = useChatStoreLab((state) => state.setInsertChatData);
+  const setPrompt = useChatStoreLab((state) => state.setPrompt);
+  const setIsRunning = useChatStoreLab((state) => state.setIsRunning);
   const ref = useRef(false);
-  const setLastChatMessageId = useChatStore(
+  const setLastChatMessageId = useChatStoreLab(
     (state) => state.setLastChatMessageId,
   );
   const { enqueueErrorBar } = useToast();
   const [updateComplete, setUpdateComplete] = useState(false);
   let controller: AbortController | undefined;
-  const menuNum = useChatStore((state) => state.menuNum);
-  const setMenuNum = useChatStore((state) => state.setMenuNum);
-  const isFlowChat = useChatStore((state) => state.isFlowChat);
-  const setIsFlowChat = useChatStore((state) => state.setIsFlowChat);
-
+  const menuNum = useChatStoreLab((state) => state.menuNum);
+  const setMenuNum = useChatStoreLab((state) => state.setMenuNum);
+  const isFlowChat = useChatStoreLab((state) => state.isFlowChat);
+  const setIsFlowChat = useChatStoreLab((state) => state.setIsFlowChat);
+  const daouOfficeCookie = useChatStoreLab((state) => state.daouOfficeCookie);
   const handleSendMessage = async () => {
     setIsRunning(true);
     controller = new AbortController();
     const lastChatMessageId = getBotLastId(chatData);
-
+    console.log('prompt = ', prompt);
     setLastChatMessageId(lastChatMessageId);
     const setting = systemSettings(chatData, prompt, menuNum);
     const url = setting?.url as string;
     const params = setting?.setting as object;
+    const header = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${daouOfficeCookie}`,
+    };
     try {
       const response = await fetchChatResponse(
         url,
@@ -55,6 +57,7 @@ const ChatLab = () => {
         true,
         controller,
         setIsRunning,
+        header,
       );
       console.log(response);
 
@@ -138,7 +141,6 @@ const ChatLab = () => {
       setPrompt(''); // 입력란 초기화
       return;
     }
-
     // 새로운 채팅 데이터 추가
     setInsertChatData({
       role: 'user',
@@ -167,7 +169,6 @@ const ChatLab = () => {
   return (
     <div className="relative flex h-full flex-col items-center">
       <AppBar />
-      <Login />
       <ChatBody />
       <ChatInput handleSubmit={handleSubmit} />
     </div>

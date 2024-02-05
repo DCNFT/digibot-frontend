@@ -1,7 +1,11 @@
+'use client';
+
 import useToast from '@/hooks/useToast';
-import { Button } from './ui/button';
+import { useRouter } from 'next/router';
+
 import useChatStore from '@/store/useChatStore';
 import { useCopyToClipboard } from '@/hooks/useCopyToClipboard';
+import { DialogCloseButton } from '@/views/lab/components/SettingModal';
 
 const BannerTitle = () => {
   const menuNum = useChatStore((state) => state.menuNum);
@@ -24,6 +28,8 @@ const AppBar = () => {
   const setMenuNum = useChatStore((state) => state.setMenuNum);
   const chatData = useChatStore((state) => state.chatData);
   const setChatData = useChatStore((state) => state.setChatData);
+  // const router = useRouter();
+
   const handleMenuNumber = (menuNumber: number) => {
     setMenuNum(menuNumber);
     setChatData([]);
@@ -41,20 +47,10 @@ const AppBar = () => {
 
   return (
     <div className="flex bg:white max-h-[60px] min-h-[60px] w-full items-center justify-center border-b-2 px-20 font-bold">
-      <div className="flex flex-col gap-2">
-        <div className="flex gap-3">
-          {/* {Array.from({ length: 5 }, (_, i) => (
-            <Button
-              key={i + 1}
-              className={buttonStyle(i + 1)}
-              onClick={() => handleMenuNumber(i + 1)}
-            >
-              {i + 1}
-            </Button>
-          ))} */}
-        </div>
+      <div className="flex gap-2 items-center">
         <BannerTitle />
-        {/* <Button onClick={handleLog}>console and copy chatHistory</Button> */}
+        {/* {router?.pathname === '/lab' && <DialogCloseButton />} */}
+        <DialogCloseButton />
       </div>
     </div>
   );

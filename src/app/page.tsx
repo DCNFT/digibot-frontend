@@ -1,5 +1,5 @@
 'use client';
-import AppBar from '@/components/Appbar';
+
 import Chat from '@/views/chat';
 
 export default function HomePage() {

@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 export async function POST(request: Request) {
   const json = await request.json();
   const { username, password } = json as {
@@ -39,23 +37,40 @@ export async function POST(request: Request) {
     'sec-ch-ua-platform': '"macOS"',
   };
 
+  // 쿠키를 분리하기 위한 함수 정의
+  function parseCookies(headerValue: string) {
+    const cookies: { [key: string]: string } = {}; // Add index signature to allow indexing with a string parameter
+    const cookiePairs = headerValue.split(', ');
+
+    cookiePairs.forEach((cookie) => {
+      // ';'로 쿠키 이름과 값 분리
+      const parts = cookie.split(';')[0]; // 첫 번째 부분만 사용 (Path, Expires 등은 무시)
+      const [name, value] = parts.split('=');
+      cookies[name] = value;
+    });
+
+    return cookies;
+  }
+
   try {
     console.log('try');
     const response = await fetch(url, {
       method: 'POST',
+      credentials: 'include',
       headers,
-      body: JSON.stringify({
-        username: username,
-        password: password,
-        captcha: '',
-        returnUrl: '',
-      }),
+      body: JSON.stringify(data),
     });
+    console.log(response.headers);
 
-    const res = await response.json();
-    // 응답에서 쿠키 추출 (예시)
-    console.log(res.headers.get('set-cookie'));
-    return new Response(JSON.stringify({ data: res.data }), {
+    // 예시로 주어진 HeadersList 객체에서 'set-cookie' 헤더 값을 추출
+    const setCookieHeader = response.headers.get('set-cookie');
+    // 쿠키 파싱
+    const cookies = parseCookies(setCookieHeader as string);
+    // 'GOSSOcookie' 값 추출
+    const gossoCookieValue = cookies['GOSSOcookie'];
+
+    console.log('gossoCookieValue = ', gossoCookieValue);
+    return new Response(JSON.stringify({ cookie: gossoCookieValue }), {
       status: 200,
     });
   } catch (error: any) {
