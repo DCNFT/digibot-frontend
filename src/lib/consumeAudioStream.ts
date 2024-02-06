@@ -6,7 +6,9 @@ export async function consumeAudioStream(
   const reader = stream.getReader();
   const chunks = [];
 
-  signal.addEventListener('abort', () => reader.cancel(), { once: true });
+  if (signal) {
+    signal.addEventListener('abort', () => reader.cancel(), { once: true });
+  }
 
   try {
     while (true) {
@@ -23,7 +25,7 @@ export async function consumeAudioStream(
     const audioBlob = new Blob(chunks, { type: 'audio/opus' }); // 오디오 형식에 맞게 MIME 타입 설정
     callback(audioBlob);
   } catch (error) {
-    if (signal.aborted) {
+    if (signal && signal.aborted) {
       console.error('Stream reading was aborted:', error);
     } else {
       console.error('Error consuming audio stream:', error);

@@ -9,15 +9,20 @@ const AudioPlayer = () => {
 
     const mediaSource = new MediaSource();
     const audio = document.querySelector('audio');
-    audio.src = URL.createObjectURL(mediaSource);
+    if (audio) {
+      audio.src = URL.createObjectURL(mediaSource);
+    }
 
     mediaSource.addEventListener('sourceopen', () => {
       const sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg');
-      const queue = [];
+      const queue: Uint8Array[] = [];
 
       sourceBuffer.addEventListener('updateend', () => {
         if (queue.length > 0 && !sourceBuffer.updating) {
-          sourceBuffer.appendBuffer(queue.shift());
+          const buffer = queue.shift();
+          if (buffer) {
+            sourceBuffer.appendBuffer(buffer);
+          }
         }
       });
 
@@ -34,9 +39,9 @@ const AudioPlayer = () => {
         }),
       })
         .then((response) => {
-          const reader = response.body.getReader();
+          const reader = response.body?.getReader();
           const pump = () => {
-            reader.read().then(({ done, value }) => {
+            reader!.read().then(({ done, value }) => {
               if (done) {
                 mediaSource.endOfStream();
                 return;

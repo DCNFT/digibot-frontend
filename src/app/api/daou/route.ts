@@ -60,7 +60,7 @@ export async function POST(request: Request) {
       headers,
       body: JSON.stringify(data),
     });
-    console.log(response.headers);
+    //console.log(response.headers);
 
     // 예시로 주어진 HeadersList 객체에서 'set-cookie' 헤더 값을 추출
     const setCookieHeader = response.headers.get('set-cookie');
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
     // 'GOSSOcookie' 값 추출
     const gossoCookieValue = cookies['GOSSOcookie'];
 
-    console.log('gossoCookieValue = ', gossoCookieValue);
+    //console.log('gossoCookieValue = ', gossoCookieValue);
     return new Response(JSON.stringify({ cookie: gossoCookieValue }), {
       status: 200,
     });

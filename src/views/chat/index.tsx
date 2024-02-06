@@ -59,7 +59,7 @@ const Chat = () => {
       console.log(response);
 
       const fullText = await processResponse(
-        response,
+        response as Response,
         true,
         controller,
         //setFirstTokenReceived,
