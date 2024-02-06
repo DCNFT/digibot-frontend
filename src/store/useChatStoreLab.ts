@@ -6,7 +6,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { SYSTEM_MESSAGE_LAB } from '@/constants/default';
 
 type State = {
-  daouOfficeCookie: string;
   prompt: string;
   isRunning: boolean;
   chatData: Message[];
@@ -28,7 +27,6 @@ type Actions = {
   ) => void;
   setLastChatMessageId: (lastChatMessageId: string | undefined) => void;
   setMenuNum: (menuNum: number) => void;
-  setDaouOfficeCookie: (daouOfficeCookie: string) => void;
 };
 
 const initialState: State = {
@@ -44,7 +42,6 @@ const initialState: State = {
   isFlowChat: true,
   lastChatMessageId: undefined,
   menuNum: 5,
-  daouOfficeCookie: '',
 };
 
 const useChatStoreLab = create(
@@ -70,9 +67,6 @@ const useChatStoreLab = create(
       setMenuNum: (menuNum) => set({ menuNum }),
       setIsFlowChat(isFlowChat) {
         set({ isFlowChat });
-      },
-      setDaouOfficeCookie(daouOfficeCookie) {
-        set({ daouOfficeCookie });
       },
     })),
   ),

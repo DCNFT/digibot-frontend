@@ -1,5 +1,3 @@
-import { CopyIcon } from '@radix-ui/react-icons';
-
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -11,8 +9,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import Login from '@/views/lab/components/Login';
 
 export function DialogCloseButton() {

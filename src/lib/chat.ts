@@ -7,6 +7,7 @@ import {
   SYSTEM_MESSAGE_LAB,
 } from '@/constants/default';
 import { v4 as uuidv4 } from 'uuid';
+import { Profile } from '@/types/daouOffice';
 
 export const fetchChatResponse = async (
   url: string,
@@ -112,6 +113,8 @@ export const systemSettings = (
   chatData: Message[],
   prompt: string | undefined,
   menuNum: number,
+  isLab = false,
+  profile?: Profile,
 ) => {
   if (USE_OPEN_AI_SERVER)
     return {
@@ -133,16 +136,21 @@ export const systemSettings = (
     };
 
   if (!USE_OPEN_AI_SERVER) {
+    let setting = {
+      menu_num: menuNum || 5,
+      chat_history: chatData
+        .filter(({ role }) => role !== 'system') // 'system' 역할을 제외
+        .map(({ id, ...rest }) => rest) // id 제외
+        .slice(0, -2),
+      query: prompt,
+      profile: (menuNum == 98 || menuNum == 99) && profile,
+    };
+
     return {
-      url: `${process.env.NEXT_PUBLIC_BACKEND_API}/chat/daou`,
-      setting: {
-        menu_num: menuNum || 5,
-        chat_history: chatData
-          .filter(({ role }) => role !== 'system') // 'system' 역할을 제외
-          .map(({ id, ...rest }) => rest) // id 제외
-          .slice(0, -2),
-        query: prompt,
-      },
+      url: isLab
+        ? `${process.env.NEXT_PUBLIC_BACKEND_API}/chat/daou`
+        : `${process.env.NEXT_PUBLIC_BACKEND_API}/chat/prompt`,
+      setting,
     };
   }
 };

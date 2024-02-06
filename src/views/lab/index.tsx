@@ -16,7 +16,8 @@ import { COMMAND_LIST, MENU_DATA_LAB } from '@/views/chat/data';
 import { Message } from '@/types/chat';
 import { v4 as uuidv4 } from 'uuid';
 import AppBar from '@/components/Appbar';
-import { error } from 'console';
+import useDaouOfficeStore from '@/store/useDaouOfficeStore';
+
 const ChatLab = () => {
   const prompt = useChatStoreLab((state) => state.prompt);
   const chatData = useChatStoreLab((state) => state.chatData);
@@ -38,16 +39,20 @@ const ChatLab = () => {
   const setMenuNum = useChatStoreLab((state) => state.setMenuNum);
   const isFlowChat = useChatStoreLab((state) => state.isFlowChat);
   const setIsFlowChat = useChatStoreLab((state) => state.setIsFlowChat);
-  const daouOfficeCookie = useChatStoreLab((state) => state.daouOfficeCookie);
+  const profile = useDaouOfficeStore((store) => store.profile);
+  const daouOfficeCookie = useDaouOfficeStore(
+    (state) => state.daouOfficeCookie,
+  );
   const handleSendMessage = async () => {
     setIsRunning(true);
     controller = new AbortController();
     const lastChatMessageId = getBotLastId(chatData);
     console.log('prompt = ', prompt);
     setLastChatMessageId(lastChatMessageId);
-    const setting = systemSettings(chatData, prompt, menuNum);
+    const setting = systemSettings(chatData, prompt, menuNum, true, profile);
     const url = setting?.url as string;
     const params = setting?.setting as object;
+    console.log('params = ', params);
     const header = {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${daouOfficeCookie}`,
@@ -138,7 +143,7 @@ const ChatLab = () => {
     }
 
     if (prompt === '/메뉴') {
-      const systemMessage = getDefaultSystemMessage();
+      const systemMessage = getDefaultSystemMessage(true);
       setInsertChatData(systemMessage as Message);
       setIsFlowChat(true);
       setPrompt(''); // 입력란 초기화
