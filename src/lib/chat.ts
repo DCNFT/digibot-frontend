@@ -7,6 +7,7 @@ import {
   SYSTEM_MESSAGE_LAB,
 } from '@/constants/default';
 import { v4 as uuidv4 } from 'uuid';
+
 export const fetchChatResponse = async (
   url: string,
   body: object,
@@ -26,25 +27,32 @@ export const fetchChatResponse = async (
     signal: controller.signal,
   });
 
+  console.log('response', response);
   if (!response.ok) {
+    console.log('response not ok');
+    const errorData = await response.json(); // 오류 메시지를 포함하고 있는 경우
     if (response.status === 404 && !isHosted) {
-      // toast.error(
-      //   'Model not found. Make sure you have it downloaded via Ollama.',
-      // );
+      console.log('404');
+      return {
+        error: true,
+        message:
+          errorData.message ||
+          `Error ${response.status}: ${response.statusText}`,
+      };
     }
 
-    const errorData = await response.json();
-    //toast.error(errorData.message);
-    console.log(errorData);
-    setIsRunning(false);
-    // setChatMessages((prevMessages) => prevMessages.slice(0, -2));
+    return {
+      error: true,
+      message:
+        errorData.message || `Error ${response.status}: ${response.statusText}`,
+    };
   }
 
   return response;
 };
 
 export const processResponse = async (
-  response: Response,
+  response: Response | null,
   isHosted: boolean,
   controller: AbortController,
   //setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
@@ -53,12 +61,17 @@ export const processResponse = async (
     text: string,
   ) => void,
   lastChatMessageId: string | undefined,
+  isError = false,
+  errorMessage = '',
   //setToolInUse: React.Dispatch<React.SetStateAction<'none' | 'retrieval'>>,
 ) => {
   let fullText = '';
   let contentToAdd = '';
-
-  if (response.body) {
+  if (isError && errorMessage !== '') {
+    setChatDataUpdateWithMessageId(lastChatMessageId, errorMessage);
+    return errorMessage;
+  }
+  if (response?.body) {
     await consumeReadableStream(
       response.body,
       (chunk) => {
@@ -74,7 +87,6 @@ export const processResponse = async (
       },
       controller.signal,
     );
-
     return fullText;
   } else {
     throw new Error('Response body is null');

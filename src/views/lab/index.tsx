@@ -16,6 +16,7 @@ import { COMMAND_LIST, MENU_DATA_LAB } from '@/views/chat/data';
 import { Message } from '@/types/chat';
 import { v4 as uuidv4 } from 'uuid';
 import AppBar from '@/components/Appbar';
+import { error } from 'console';
 const ChatLab = () => {
   const prompt = useChatStoreLab((state) => state.prompt);
   const chatData = useChatStoreLab((state) => state.chatData);
@@ -31,6 +32,7 @@ const ChatLab = () => {
   );
   const { enqueueErrorBar } = useToast();
   const [updateComplete, setUpdateComplete] = useState(false);
+
   let controller: AbortController | undefined;
   const menuNum = useChatStoreLab((state) => state.menuNum);
   const setMenuNum = useChatStoreLab((state) => state.setMenuNum);
@@ -59,10 +61,26 @@ const ChatLab = () => {
         setIsRunning,
         header,
       );
-      console.log(response);
+      console.log('[seo]  = ', response);
+
+      if ('error' in response && response.error) {
+        const fullText = await processResponse(
+          null,
+          true,
+          controller,
+          //setFirstTokenReceived,
+          setChatDataUpdateWithMessageId,
+          lastChatMessageId,
+          true,
+          `${response.message} 쿠키값 재 설정 필요`,
+        );
+        enqueueErrorBar(response.message);
+        setIsRunning(false);
+        return;
+      }
 
       const fullText = await processResponse(
-        response,
+        response as Response,
         true,
         controller,
         //setFirstTokenReceived,
@@ -71,8 +89,19 @@ const ChatLab = () => {
       );
       setIsRunning(false);
     } catch (e: any) {
+      console.log('[seo] error = ', e);
       setIsRunning(false);
-      enqueueErrorBar(e.message);
+      enqueueErrorBar(e.status);
+      // processResponse(
+      //   null,
+      //   true,
+      //   controller,
+      //   //setFirstTokenReceived,
+      //   setChatDataUpdateWithMessageId,
+      //   lastChatMessageId,
+      //   true,
+      //   e.message,
+      // );
     }
   };
 
