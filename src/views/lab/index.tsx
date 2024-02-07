@@ -202,7 +202,7 @@ const ChatLab = () => {
 
   return (
     <div className="relative flex h-full flex-col items-center">
-      <AppBar />
+      <AppBar isLab={true} />
       <ChatBody />
       <ChatInput handleSubmit={handleSubmit} />
     </div>

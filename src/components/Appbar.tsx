@@ -19,7 +19,7 @@ const BannerTitle = () => {
     </div>
   );
 };
-const AppBar = () => {
+const AppBar = ({ isLab = false }) => {
   const { enqueueInfoBar } = useToast();
   const { isCopied, copyToClipboard } = useCopyToClipboard({
     timeout: 2000,
@@ -50,7 +50,7 @@ const AppBar = () => {
       <div className="flex gap-2 items-center">
         <BannerTitle />
         {/* {router?.pathname === '/lab' && <DialogCloseButton />} */}
-        <DialogCloseButton />
+        {isLab && <DialogCloseButton />}
       </div>
     </div>
   );
