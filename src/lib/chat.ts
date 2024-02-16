@@ -14,7 +14,7 @@ export const fetchChatResponse = async (
   body: object,
   isHosted: boolean,
   controller: AbortController,
-  setIsRunning: (isRunning: boolean) => void,
+  setIsGenerating: (isGenerating: boolean) => void,
   header?: object,
   // setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
 ) => {

@@ -11,7 +11,7 @@ type ChatInputProps = {
 const ChatInput = ({ handleSubmit }: ChatInputProps) => {
   const prompt = useChatStore((state) => state.prompt);
   const setPrompt = useChatStore((state) => state.setPrompt);
-  const isRunning = useChatStore((state) => state.isRunning);
+  const isGenerating = useChatStore((state) => state.isGenerating);
 
   const handleInput = (value: string) => {
     setPrompt(value);
@@ -20,7 +20,12 @@ const ChatInput = ({ handleSubmit }: ChatInputProps) => {
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
   const [isTyping, setIsTyping] = useState(false);
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (!isTyping && event.key === 'Enter' && !event.shiftKey && !isRunning) {
+    if (
+      !isTyping &&
+      event.key === 'Enter' &&
+      !event.shiftKey &&
+      !isGenerating
+    ) {
       event.preventDefault();
       //setIsPromptPickerOpen(false);
       handleSubmit(event);
@@ -83,12 +88,12 @@ const ChatInput = ({ handleSubmit }: ChatInputProps) => {
         />
         <Button
           onClick={handleSubmit}
-          disabled={isRunning}
+          disabled={isGenerating}
           className={`flex-shrink-0 ${
-            isRunning ? 'bg-blue-500' : 'bg-blue-600 hover:bg-blue-700'
+            isGenerating ? 'bg-blue-500' : 'bg-blue-600 hover:bg-blue-700'
           } text-white py-2 px-4 rounded-md transition duration-300`}
         >
-          {isRunning && <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />}
+          {isGenerating && <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />}
           Send
         </Button>
       </div>

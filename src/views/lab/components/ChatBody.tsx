@@ -33,7 +33,7 @@ const Intro = ({ chatData }: IntroProps) => {
 
 const ChatBody = () => {
   const chatData = useChatStoreLab((state) => state.chatData);
-  const isRunning = useChatStoreLab((state) => state.isRunning);
+  const isGenerating = useChatStoreLab((state) => state.isGenerating);
   const lastChatMessageId = useChatStoreLab((state) => state.lastChatMessageId);
   const messagesEndRef = useRef<any>(null);
   const scrollToBottom = () => {
@@ -53,7 +53,7 @@ const ChatBody = () => {
             key={`chat-message-${index}`}
             isLastChatMessage={lastChatMessageId === message.id}
             message={message}
-            isRunning={isRunning}
+            isGenerating={isGenerating}
           />
         ))}
       </div>

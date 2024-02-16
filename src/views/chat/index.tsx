@@ -25,7 +25,7 @@ const Chat = () => {
   );
   const setInsertChatData = useChatStore((state) => state.setInsertChatData);
   const setPrompt = useChatStore((state) => state.setPrompt);
-  const setIsRunning = useChatStore((state) => state.setIsRunning);
+  const setIsGenerating = useChatStore((state) => state.setIsGenerating);
   const ref = useRef(false);
   const setLastChatMessageId = useChatStore(
     (state) => state.setLastChatMessageId,
@@ -34,12 +34,12 @@ const Chat = () => {
   const [updateComplete, setUpdateComplete] = useState(false);
   let controller: AbortController | undefined;
   const menuNum = useChatStore((state) => state.menuNum);
-  const setMenuNum = useChatStore((state) => state.setMenuNum);
-  const isFlowChat = useChatStore((state) => state.isFlowChat);
-  const setIsFlowChat = useChatStore((state) => state.setIsFlowChat);
+  // const setMenuNum = useChatStore((state) => state.setMenuNum);
+  // const isFlowChat = useChatStore((state) => state.isFlowChat);
+  // const setIsFlowChat = useChatStore((state) => state.setIsFlowChat);
 
   const handleSendMessage = async () => {
-    setIsRunning(true);
+    setIsGenerating(true);
     controller = new AbortController();
     const lastChatMessageId = getBotLastId(chatData);
 
@@ -53,7 +53,7 @@ const Chat = () => {
         params,
         true,
         controller,
-        setIsRunning,
+        setIsGenerating,
       );
       console.log(response);
 
@@ -65,9 +65,9 @@ const Chat = () => {
         setChatDataUpdateWithMessageId,
         lastChatMessageId,
       );
-      setIsRunning(false);
+      setIsGenerating(false);
     } catch (e: any) {
-      setIsRunning(false);
+      setIsGenerating(false);
       enqueueErrorBar(e.message);
     }
   };
@@ -87,56 +87,56 @@ const Chat = () => {
   };
 
   // 사용자가 "/명령어"를 입력했을 때 호출되는 함수
-  const handleCommandsInput = () => {
-    setInsertChatData({
-      role: 'system',
-      content: `도움말 명령어 리스트입니다:\n${COMMAND_LIST}`,
-      id: uuidv4(),
-    });
-    setPrompt(''); // 입력란 초기화
-  };
+  // const handleCommandsInput = () => {
+  //   setInsertChatData({
+  //     role: 'system',
+  //     content: `도움말 명령어 리스트입니다:\n${COMMAND_LIST}`,
+  //     id: uuidv4(),
+  //   });
+  //   setPrompt(''); // 입력란 초기화
+  // };
 
   const handleSubmit = async (e: FormEvent) => {
     const { lastUserChatIdIncrease, lastBotChatIdIncrease } = getIds();
     console.log(lastBotChatIdIncrease);
-    if (prompt === '/명령어') {
-      handleCommandsInput();
-      return;
-    }
+    // if (prompt === '/명령어') {
+    //   handleCommandsInput();
+    //   return;
+    // }
 
-    if (prompt === '/메뉴') {
-      const systemMessage = getDefaultSystemMessage();
-      setInsertChatData(systemMessage as Message);
-      setIsFlowChat(true);
-      setPrompt(''); // 입력란 초기화
-      return;
-    }
+    // if (prompt === '/메뉴') {
+    //   const systemMessage = getDefaultSystemMessage();
+    //   setInsertChatData(systemMessage as Message);
+    //   setIsFlowChat(false);
+    //   setPrompt(''); // 입력란 초기화
+    //   return;
+    // }
 
-    if (isFlowChat) {
-      const menuObject = MENU_DATA.find((item) => {
-        return item.menu_id === prompt.toString();
-      });
-      console.log('menuObject = ', menuObject);
-      if (menuObject) {
-        setInsertChatData({
-          role: 'system',
-          content: `${menuObject?.menu_name} 선택하셨습니다 관련 질문을 해주세요~`,
-          id: uuidv4(),
-        });
-        setMenuNum(Number(menuObject.menu_id));
-        setIsFlowChat(false);
-        setPrompt(''); // 입력란 초기화
-        return;
-      }
+    // if (isFlowChat) {
+    //   const menuObject = MENU_DATA.find((item) => {
+    //     return item.menu_id === prompt.toString();
+    //   });
+    //   console.log('menuObject = ', menuObject);
+    //   if (menuObject) {
+    //     setInsertChatData({
+    //       role: 'system',
+    //       content: `${menuObject?.menu_name} 선택하셨습니다 관련 질문을 해주세요~`,
+    //       id: uuidv4(),
+    //     });
+    //     setMenuNum(Number(menuObject.menu_id));
+    //     setIsFlowChat(false);
+    //     setPrompt(''); // 입력란 초기화
+    //     return;
+    //   }
 
-      setInsertChatData({
-        role: 'system',
-        content: '잘못 선택하셧습니다. 다시 선택해주세요.',
-        id: uuidv4(),
-      });
-      setPrompt(''); // 입력란 초기화
-      return;
-    }
+    //   setInsertChatData({
+    //     role: 'system',
+    //     content: '잘못 선택하셧습니다. 다시 선택해주세요.',
+    //     id: uuidv4(),
+    //   });
+    //   setPrompt(''); // 입력란 초기화
+    //   return;
+    // }
 
     // 새로운 채팅 데이터 추가
     setInsertChatData({

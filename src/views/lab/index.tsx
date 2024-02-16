@@ -26,7 +26,7 @@ const ChatLab = () => {
   );
   const setInsertChatData = useChatStoreLab((state) => state.setInsertChatData);
   const setPrompt = useChatStoreLab((state) => state.setPrompt);
-  const setIsRunning = useChatStoreLab((state) => state.setIsRunning);
+  const setIsGenerating = useChatStoreLab((state) => state.setIsGenerating);
   const ref = useRef(false);
   const setLastChatMessageId = useChatStoreLab(
     (state) => state.setLastChatMessageId,
@@ -44,7 +44,7 @@ const ChatLab = () => {
     (state) => state.daouOfficeCookie,
   );
   const handleSendMessage = async () => {
-    setIsRunning(true);
+    setIsGenerating(true);
     controller = new AbortController();
     const lastChatMessageId = getBotLastId(chatData);
     console.log('prompt = ', prompt);
@@ -63,7 +63,7 @@ const ChatLab = () => {
         params,
         true,
         controller,
-        setIsRunning,
+        setIsGenerating,
         header,
       );
       console.log('[seo]  = ', response);
@@ -80,7 +80,7 @@ const ChatLab = () => {
           `${response.message} 쿠키값 재 설정 필요`,
         );
         enqueueErrorBar(response.message);
-        setIsRunning(false);
+        setIsGenerating(false);
         return;
       }
 
@@ -92,10 +92,10 @@ const ChatLab = () => {
         setChatDataUpdateWithMessageId,
         lastChatMessageId,
       );
-      setIsRunning(false);
+      setIsGenerating(false);
     } catch (e: any) {
       console.log('[seo] error = ', e);
-      setIsRunning(false);
+      setIsGenerating(false);
       enqueueErrorBar(e.status);
       // processResponse(
       //   null,

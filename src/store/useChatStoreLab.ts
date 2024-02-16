@@ -7,7 +7,7 @@ import { SYSTEM_MESSAGE_LAB } from '@/constants/default';
 
 type State = {
   prompt: string;
-  isRunning: boolean;
+  isGenerating: boolean;
   chatData: Message[];
   isFlowChat: boolean;
   lastChatMessageId: string | undefined;
@@ -17,7 +17,7 @@ type State = {
 type Actions = {
   reset: () => void;
   setPrompt: (prompt: string) => void;
-  setIsRunning: (isRunning: boolean) => void;
+  setIsGenerating: (isGenerating: boolean) => void;
   setInsertChatData: (newMessage: Message) => void;
   setChatData: (chatData: Message[]) => void;
   setIsFlowChat: (isFlowChat: boolean) => void;
@@ -31,7 +31,7 @@ type Actions = {
 
 const initialState: State = {
   prompt: '',
-  isRunning: false,
+  isGenerating: false,
   chatData: [
     {
       role: 'system',
@@ -50,7 +50,7 @@ const useChatStoreLab = create(
       ...initialState,
       reset: () => set(initialState),
       setPrompt: (prompt) => set({ prompt }),
-      setIsRunning: (isRunning) => set({ isRunning }),
+      setIsGenerating: (isGenerating) => set({ isGenerating }),
       setChatDataUpdateWithMessageId: (lastChatMessageId, text) =>
         set((state) => {
           const chatMessage = state.chatData.find(
