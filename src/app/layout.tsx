@@ -9,6 +9,8 @@ import '../styles/index.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '@/styles/custom-toast.css';
+import '@/styles/style.css';
+import AppBar from '@/components/Appbar';
 
 moment.locale('ko');
 const inter = Inter({ subsets: ['latin'] });
@@ -32,9 +34,13 @@ export default function RootLayout({
       >
         <Providers defaultTheme="white" attribute="class">
           <ToastContainer />
-          <main className="bg-background text-foreground flex h-screen flex-col items-center">
+          <div>
+            <AppBar />
             {children}
-          </main>
+          </div>
+          {/* <main className="bg-background text-foreground flex h-screen flex-col items-center"> */}
+
+          {/* </main> */}
         </Providers>
       </body>
     </html>

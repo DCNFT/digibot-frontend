@@ -149,7 +149,8 @@ export const systemSettings = (
     return {
       url: isLab
         ? `${process.env.NEXT_PUBLIC_BACKEND_API}/chat/daou`
-        : `${process.env.NEXT_PUBLIC_BACKEND_API}/chat/prompt`,
+        : //`http://localhost:8000/chat/daou`
+          `${process.env.NEXT_PUBLIC_BACKEND_API}/chat/prompt`,
       setting,
     };
   }

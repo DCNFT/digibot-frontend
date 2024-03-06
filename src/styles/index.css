@@ -1,20 +1,20 @@
-@import url("https://fonts.googleapis.com/css?family=Noto + Sans + KR");
+@import url('https://fonts.googleapis.com/css?family=Noto + Sans + KR');
 
 @font-face {
-  font-family: "Sofia Pro";
-  src: url("/fonts/Sofia-Pro-Regular.woff") format("woff");
+  font-family: 'Sofia Pro';
+  src: url('/fonts/Sofia-Pro-Regular.woff') format('woff');
   /* Add more font formats if necessary */
   /* Add additional font properties as desired, such as font-weight and font-style */
 }
 
 body {
-  font-family: "Sofia Pro", sans-serif;
+  font-family: 'Sofia Pro', sans-serif;
 }
 
 .loader {
   border: 4px solid rgba(255, 255, 255, 0.6);
   border-radius: 50%;
-  border-top: 4px solid #3498db; /* Primary color for the loader */
+  border-top: 4px solid #6a5acd; /* Primary color for the loader */
   width: 30px;
   height: 30px;
   -webkit-animation: spin 1s linear infinite; /* Safari */

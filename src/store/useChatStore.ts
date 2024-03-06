@@ -8,6 +8,7 @@ import { SYSTEM_MESSAGE } from '@/constants/default';
 type State = {
   prompt: string;
   isGenerating: boolean;
+  isSideMenuOpen?: boolean;
   chatData: Message[];
   isFlowChat: boolean;
   lastChatMessageId: string | undefined;
@@ -18,6 +19,7 @@ type Actions = {
   reset: () => void;
   setPrompt: (prompt: string) => void;
   setIsGenerating: (isGenerating: boolean) => void;
+  setIsSideMenuOpen: (isSideMenuOpen: boolean) => void;
   setInsertChatData: (newMessage: Message) => void;
   setChatData: (chatData: Message[]) => void;
   setIsFlowChat: (isFlowChat: boolean) => void;
@@ -31,6 +33,7 @@ type Actions = {
 
 const initialState: State = {
   prompt: '',
+  isSideMenuOpen: false,
   isGenerating: false,
   chatData: [
     {
@@ -67,6 +70,9 @@ const useChatStore = create(
       setMenuNum: (menuNum) => set({ menuNum }),
       setIsFlowChat(isFlowChat) {
         set({ isFlowChat });
+      },
+      setIsSideMenuOpen(isSideMenuOpen) {
+        set({ isSideMenuOpen });
       },
     })),
   ),
