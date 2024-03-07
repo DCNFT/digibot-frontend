@@ -36,12 +36,9 @@ export default function RootLayout({
       >
         <Providers defaultTheme="white" attribute="class">
           <ToastContainer />
-          <div>
-            <AppBar />
-            {children}
-          </div>
+          <AppBar />
+          {children}
           {/* <main className="bg-background text-foreground flex h-screen flex-col items-center"> */}
-
           {/* </main> */}
         </Providers>
       </body>
