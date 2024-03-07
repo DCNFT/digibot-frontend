@@ -17,10 +17,6 @@ import {
 } from '@/lib/chat';
 
 import useToast from '@/hooks/useToast';
-import { COMMAND_LIST, MENU_DATA_LAB } from '@/views/chat/data';
-import { Message } from '@/types/chat';
-import { v4 as uuidv4 } from 'uuid';
-import AppBar from '@/components/Appbar';
 import useDaouOfficeStore from '@/store/useDaouOfficeStore';
 
 const NewHome = () => {
