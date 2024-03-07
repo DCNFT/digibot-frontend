@@ -1,8 +1,4 @@
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { TextareaAutosize } from '@/components/ui/textareaAutosize';
 import useChatStore from '@/store/useChatStore';
-import { ReloadIcon } from '@radix-ui/react-icons';
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import HiddenButtons from './HiddenButtons';
 
@@ -62,6 +58,7 @@ const ChatInput = ({ handleSubmit }: ChatInputProps) => {
     <>
       <HiddenButtons
         isShowHiddenButton={isShowHiddenButton}
+        handleOptionButton={handleOptionButton}
         handleSubmit={handleSubmit}
       />
       <form id="chat-form" onSubmit={handleSubmit}>

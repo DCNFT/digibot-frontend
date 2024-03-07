@@ -99,8 +99,27 @@ const NewHome = () => {
     return { lastUserChatIdIncrease, lastBotChatIdIncrease };
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    console.log('handleSubmit = !!');
+  const handleSubmit = async (e: FormEvent, sendPrompt = '') => {
+    if (sendPrompt !== '') {
+      const { lastUserChatIdIncrease, lastBotChatIdIncrease } = getIds();
+      e.preventDefault();
+      // 새로운 채팅 데이터 추가
+      setInsertChatData({
+        role: 'user',
+        content: sendPrompt,
+        id: lastUserChatIdIncrease,
+      });
+
+      setInsertChatData({
+        role: 'assistant',
+        content: '',
+        id: lastBotChatIdIncrease,
+      });
+      setUpdateComplete(true); // 상태 업데이트 완료 플래그 설정
+      ref.current = true; // 참조 플래그 업데이트
+      return;
+    }
+
     const { lastUserChatIdIncrease, lastBotChatIdIncrease } = getIds();
     e.preventDefault();
     // 새로운 채팅 데이터 추가

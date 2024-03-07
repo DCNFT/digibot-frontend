@@ -1,6 +1,6 @@
 'use client';
 
-import NewHome from '@/views/new';
+import NewHome from '@/views/home';
 
 export default function HomePage() {
   return <NewHome />;

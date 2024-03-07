@@ -1,13 +1,7 @@
 'use client';
 
-import Chat from '@/views/chat';
+import Chat from '@/views/home';
 
 export default function HomePage() {
-  return (
-    <div className="flex h-full w-full">
-      <div className="bg-muted/50 flex grow flex-col">
-        <Chat />
-      </div>
-    </div>
-  );
+  return <Chat />;
 }
