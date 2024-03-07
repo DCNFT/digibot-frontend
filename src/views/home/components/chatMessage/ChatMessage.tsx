@@ -32,19 +32,38 @@ const ChatMessage = ({
   return (
     <div className="message-container">
       <div className={chatMessageClass}>
-        <img src="/images/profile.jpg" className="avatar bot-avatar" alt="" />
+        {message?.role === 'user' ? (
+          <>
+            <div className="message-content">
+              {isGenerating &&
+                (message?.content.length === 0 ||
+                  message?.content === undefined) &&
+                isLastChatMessage && <div className="loader" />}
 
-        <div className="message-content">
-          {isGenerating &&
-            (message?.content.length === 0 || message?.content === undefined) &&
-            isLastChatMessage && <div className="loader" />}
-
-          {message?.role === 'user' ? (
-            <>{message.content}</>
-          ) : (
-            <MessageMarkdown content={message?.content} />
-          )}
-        </div>
+              {message.content}
+            </div>
+            <img
+              src="/images/profile.jpg"
+              className="avatar bot-avatar"
+              alt=""
+            />
+          </>
+        ) : (
+          <>
+            <img
+              src="/images/profile.jpg"
+              className="avatar bot-avatar"
+              alt=""
+            />
+            <div className="message-content">
+              {isGenerating &&
+                (message?.content.length === 0 ||
+                  message?.content === undefined) &&
+                isLastChatMessage && <div className="loader" />}
+              <MessageMarkdown content={message?.content} />
+            </div>
+          </>
+        )}
       </div>
       <div className={chatMessageTimeClass}>{timeString}</div>
     </div>
