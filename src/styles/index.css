@@ -17,8 +17,8 @@ body {
   border-top: 4px solid #6a5acd; /* Primary color for the loader */
   width: 30px;
   height: 30px;
-  -webkit-animation: spin 1s linear infinite; /* Safari */
-  animation: spin 1s linear infinite;
+  -webkit-animation: spin 0.5s linear infinite; /* Safari */
+  animation: spin 0.5s linear infinite;
 }
 
 /* Safari */
