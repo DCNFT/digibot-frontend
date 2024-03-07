@@ -81,6 +81,7 @@ header {
   justify-content: space-between;
   align-items: center;
   z-index: 999;
+  background: #fff;
 }
 header.active {
   transform: translateX(400px);
