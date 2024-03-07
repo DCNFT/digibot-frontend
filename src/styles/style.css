@@ -48,6 +48,11 @@ body {
   font-family: 'Quicksand', sans-serif;
   font-optical-sizing: auto;
   font-style: normal;
+  padding-bottom: constant(safe-area-inset-bottom); /* iOS 11.2+ */
+  padding-bottom: env(safe-area-inset-bottom); /* iOS 11.2+ */
+  padding-bottom: calc(
+    env(safe-area-inset-bottom) + constant(safe-area-inset-bottom)
+  ); /* iOS 11.2+ */
 }
 
 button {
