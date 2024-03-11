@@ -105,7 +105,8 @@ header h1 {
   margin-right: auto;
   margin-left: auto;
   line-height: 80px;
-  font-size: 25px;
+  font-size: 20px;
+  font-weight: 500;
 }
 
 .main {
@@ -138,8 +139,8 @@ header h1 {
 }
 
 .hamburger-menu {
-  width: 30px;
-  height: 20px;
+  width: 25px;
+  height: 15px;
   margin-left: 30px;
   cursor: pointer;
   display: flex;
@@ -149,13 +150,13 @@ header h1 {
 
 .line {
   width: 100%;
-  height: 2.5px;
+  height: 1.5px;
   background-color: black;
   transition: transform 0.3s ease;
 }
 
 .hamburger-menu.active .line_1 {
-  transform: rotate(45deg) translate(7px, 5px);
+  transform: rotate(45deg) translate(6px, 6px);
 }
 
 .hamburger-menu.active .line_2 {
@@ -163,7 +164,7 @@ header h1 {
 }
 
 .hamburger-menu.active .line_3 {
-  transform: rotate(-45deg) translate(7px, -5px);
+  transform: rotate(-45deg) translate(3px, -3px);
 }
 
 .main h1 {
@@ -368,15 +369,24 @@ nav ul li a:hover {
   padding: 10px;
 }
 
-input[type='text'] {
-  width: calc(100% - 20px);
+textarea {
+  width: calc(100% - 140px);
   height: 70px;
-  padding: 10px 0px 10px 80px;
-  border-top: none;
-  outline: none;
+  padding: 10px;
   border: none;
-  border-bottom: none;
+  outline: none;
   background: rgb(243, 244, 246);
+  margin-left: 70px;
+  resize: none;
+}
+textarea::placeholder {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  line-height: inherit;
+  font-weight: 500;
+  font-family: 'Quicksand', sans-serif;
 }
 
 input[type='submit'] {
@@ -701,7 +711,7 @@ input::placeholder {
     z-index: 999;
   }
   nav {
-    margin-top: 80px;
+    margin-top: 56px;
   }
   header.active {
     transform: none;
@@ -709,7 +719,7 @@ input::placeholder {
   }
   nav.active {
     width: 100%;
-    margin-top: 80px;
+    margin-top: 56px;
   }
   /* nav.active + .main{
     display:none;
