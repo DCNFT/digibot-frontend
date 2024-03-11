@@ -45,11 +45,10 @@ button:focus {
 }
 
 body {
-  height: 100dvh;
   font-family: 'Quicksand', sans-serif;
   font-optical-sizing: auto;
   font-style: normal;
-  padding-bottom: env(safe-area-inset-bottom);
+  overflow-y: hidden;
 }
 
 button {
@@ -57,6 +56,9 @@ button {
   border: none;
 }
 
+#wrap {
+  height: 100dvh;
+}
 /* 스크롤 바 스타일 */
 #chatbox::-webkit-scrollbar {
   width: 8px;
@@ -71,6 +73,14 @@ button {
 #chatbox::-webkit-scrollbar-track {
   background: #ededed;
 }
+.header-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #ffffff;
+  z-index: 999;
+}
 
 header {
   position: fixed;
@@ -83,12 +93,13 @@ header {
   justify-content: space-between;
   align-items: center;
   z-index: 999;
-  background: #fff;
+  background-color: #fff;
 }
 header.active {
   transform: translateX(400px);
   width: calc(100% - 400px);
 }
+
 header h1 {
   margin-right: auto;
   margin-left: auto;
@@ -96,20 +107,13 @@ header h1 {
   font-size: 25px;
 }
 
-/* .main {
-  width: 100%;
-  margin-top: 80px;
-  height: calc(100vh - 80px);
-  transition: transform 0.5s ease, width 0.5s ease;
-} */
-
 .main {
   width: 100%;
-  margin-top: 80px; /* 헤더의 높이만큼 여백 추가 */
-  margin-bottom: 70px; /* chat-form의 높이만큼 여백 추가 */
-  min-height: calc(100vh - 150px); /* 화면 크기에 따라 최소 높이 지정 */
+  top: 140px;
+  bottom: 70px;
+  min-height: calc(100vh - 140px);
   transition: transform 0.5s ease, width 0.5s ease;
-  position: relative; /* chat-form과의 상대 위치 설정 */
+  position: relative;
 }
 
 .input-container {
@@ -119,7 +123,7 @@ header h1 {
 .send_btn {
   float: right;
   right: 0;
-  background-image: url(/images/send.png);
+  background-image: url(../img/send.png);
   background-size: 30px contain;
   background-size: 30px;
   background-repeat: no-repeat;
@@ -169,12 +173,12 @@ header h1 {
 nav {
   width: 0;
   overflow: hidden;
-  transition: width 0.3s ease;
+  transition: transform 0.5s ease, width 0.5s ease;
   position: fixed;
   top: 0;
   left: 0;
   bottom: 0;
-  z-index: 20;
+  z-index: 999;
   border-right: 1px solid var(--grayscale-border);
   background-color: #000;
   color: #fff;
@@ -281,7 +285,7 @@ nav ul li a:hover {
   display: block;
 }
 
-.sub-post {
+/* .sub-post {
   display: flex;
   column-gap: 10px;
   width: 100%;
@@ -290,16 +294,43 @@ nav ul li a:hover {
   background: #6a5acd;
   color: #fff;
   margin-bottom: 20px;
+} */
+.sub-post {
+  display: flex;
+  column-gap: 10px;
+  width: 100%;
+  padding: 12px;
+  position: fixed;
+  top: 80px;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background-color: #6a5acd;
+  color: #ffffff;
+  z-index: 998;
+  transition: transform 0.5s ease, width 0.5s ease;
 }
-
+.sub-post.active {
+  transform: translateX(400px);
+  width: calc(100% - 400px);
+}
 #chatbox {
-  flex: 1;
-  height: calc(100% - 152px);
+  /* flex: 1;
+  max-height: calc(100vh - 120px);
   overflow-y: auto;
   padding: 10px;
   border: none;
   border-radius: 5px;
+  background-color: #fff; */
+  position: relative;
+  overflow-y: auto;
+  bottom: 0;
+  left: 0;
+  width: 100%;
   background-color: #fff;
+  box-sizing: border-box;
+  max-height: calc(100vh - 210px);
+  padding: 20px;
 }
 
 .chat-message {
@@ -445,15 +476,13 @@ header .new-chat {
   position: relative;
   margin-bottom: 0;
 } */
-
 #chat-form {
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
-  background-color: #fff; /* chat-form의 배경색에 맞게 설정 */
+  background-color: #fff;
   z-index: 1000; /* 다른 요소 위에 레이어를 보여주기 위한 z-index 값 */
-  padding: 10px; /* 원하는 값으로 설정 */
   box-sizing: border-box;
 }
 
@@ -675,9 +704,10 @@ input::placeholder {
     width: 100%;
     margin-top: 80px;
   }
-  nav.active + .main {
-    display: none;
-  }
+  /* nav.active + .main{
+    display:none;
+  } */
+
   nav > ul {
     padding: 20px;
   }
@@ -745,22 +775,5 @@ input::placeholder {
   }
   .hidden-button {
     font-size: 2.4vw;
-  }
-}
-/* Safari의 Safe Area 조정 */
-@media screen and (constant) and (-webkit-min-device-pixel-ratio: 0) {
-  /* Safari 전용 CSS */
-  /* iPhone X, XR, XS, 11 등의 모델들 */
-  @supports (padding: constant(safe-area-inset-bottom)) {
-    .main {
-      margin-bottom: calc(
-        70px + constant(safe-area-inset-bottom)
-      ); /* Safe Area 고려하여 여백 추가 */
-    }
-    #chat-form {
-      margin-bottom: constant(
-        safe-area-inset-bottom
-      ); /* Safe Area 고려하여 chat-form의 마진 추가 */
-    }
   }
 }
