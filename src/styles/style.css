@@ -74,20 +74,21 @@ button {
   background: #ededed;
 }
 .header-container {
-  position: fixed;
-  top: 0;
-  left: 0;
+  /* position: fixed; */
+  /* top: 0;
+  left: 0; */
+  height: 80px;
   width: 100%;
   background-color: #ffffff;
   z-index: 999;
 }
 
 header {
-  position: fixed;
-  top: 0;
-  left: 0;
+  /* position: fixed; */
+  /* top: 0;
+  left: 0; */
   width: 100%;
-  height: 80px;
+  height: 100px;
   transition: transform 0.5s ease, width 0.5s ease;
   display: flex;
   justify-content: space-between;
@@ -108,10 +109,14 @@ header h1 {
 }
 
 .main {
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  top: 140px;
-  bottom: 70px;
-  min-height: calc(100vh - 140px);
+  height: calc(100% - 80px);
+  /* top: 140px; */
+  /* bottom: 70px; */
+  /* min-height: calc(100vh - 140px); */
+
   transition: transform 0.5s ease, width 0.5s ease;
   position: relative;
 }
@@ -329,7 +334,7 @@ nav ul li a:hover {
   width: 100%;
   background-color: #fff;
   box-sizing: border-box;
-  max-height: calc(100vh - 210px);
+  /* max-height: calc(100vh - 210px); */
   padding: 20px;
 }
 
@@ -477,9 +482,9 @@ header .new-chat {
   margin-bottom: 0;
 } */
 #chat-form {
-  position: fixed;
+  /* position: fixed;
   bottom: 0;
-  left: 0;
+  left: 0; */
   width: 100%;
   background-color: #fff;
   z-index: 1000; /* 다른 요소 위에 레이어를 보여주기 위한 z-index 값 */
@@ -688,7 +693,7 @@ input::placeholder {
 @media screen and (max-width: 768px) {
   header {
     width: 100%;
-    position: fixed;
+    /* position: fixed; */
     top: 0;
     left: 0;
     z-index: 999;
@@ -721,7 +726,9 @@ input::placeholder {
     box-sizing: border-box;
   }
   #chatbox {
-    max-height: calc(100vh - 120px);
+    height: 100%;
+    flex: 1 1 0%;
+    /* max-height: calc(100vh - 120px); */
     background-color: #fff;
   }
   .chat-form {
@@ -754,7 +761,7 @@ input::placeholder {
     padding: 0;
   }
   #chatbox {
-    max-height: calc(100vh - 120px);
+    /* max-height: calc(100vh - 120px); */
     background-color: #fff;
     padding: 0;
   }

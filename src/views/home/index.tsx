@@ -149,7 +149,6 @@ const NewHome = () => {
     <>
       <Sidebar />
       <div className={mainClass} id="main">
-        <SubPost />
         <ChatBody />
         <ChatInput handleSubmit={handleSubmit} />
       </div>

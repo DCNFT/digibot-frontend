@@ -55,7 +55,7 @@ const ChatInput = ({ handleSubmit }: ChatInputProps) => {
   };
 
   return (
-    <>
+    <div className="input-container">
       <HiddenButtons
         isShowHiddenButton={isShowHiddenButton}
         handleOptionButton={handleOptionButton}
@@ -87,7 +87,7 @@ const ChatInput = ({ handleSubmit }: ChatInputProps) => {
           />
         </div>
       </form>
-    </>
+    </div>
   );
 };
 
