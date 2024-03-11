@@ -34,7 +34,7 @@ const AppBar = ({ isLab = false }) => {
           />
         </div>
       </header>
-      {/* <SubPost /> */}
+      <SubPost />
     </div>
   );
 };
