@@ -21,7 +21,7 @@ import useDaouOfficeStore from '@/store/useDaouOfficeStore';
 import use100vh from '@/hooks/use100vh';
 
 const NewHome = () => {
-  use100vh();
+  // use100vh();
   const isSideMenuOpen = useChatStore((state) => state.isSideMenuOpen);
   const mainClass = classNames({
     main: true,
