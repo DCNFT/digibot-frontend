@@ -106,3 +106,42 @@ export interface Profiles {
   user_id: string;
   username: string;
 }
+
+export interface Workspaces {
+  created_at: string;
+  default_context_length: number;
+  default_model: string;
+  default_prompt: string;
+  default_temperature: number;
+  description: string;
+  embeddings_provider: string;
+  id: string;
+  image_path: string;
+  include_profile_context: boolean;
+  include_workspace_instructions: boolean;
+  instructions: string;
+  is_home: boolean;
+  name: string;
+  sharing: string;
+  updated_at: string | null;
+  user_id: string;
+}
+
+export interface Chats {
+  assistant_id: string | null;
+  context_length: number;
+  created_at: string;
+  embeddings_provider: string;
+  folder_id: string | null;
+  id: string;
+  include_profile_context: boolean;
+  include_workspace_instructions: boolean;
+  model: string;
+  name: string;
+  prompt: string;
+  sharing: string;
+  temperature: number;
+  updated_at: string | null;
+  user_id: string;
+  workspace_id: string;
+}

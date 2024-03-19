@@ -3,10 +3,14 @@ import {
   ChatMessage,
   ChatPayload,
   ChatSettings,
+  Chats,
+  FileItems,
   LLM,
   Message,
   MessageImage,
+  Messages,
   Profiles,
+  Workspaces,
 } from "@/types";
 import { consumeReadableStream } from "./consumeStream";
 import {
@@ -22,13 +26,41 @@ import {
   buildGoogleGeminiFinalMessages,
 } from "./build-prompt";
 
+export const validateChatSettings = (
+  chatSettings: ChatSettings | null,
+  modelData: LLM | undefined,
+  profile: Profiles | null,
+  selectedWorkspace: Workspaces | null,
+  messageContent: string
+) => {
+  if (!chatSettings) {
+    throw new Error("Chat settings not found");
+  }
+
+  if (!modelData) {
+    throw new Error("Model not found");
+  }
+
+  if (!profile) {
+    throw new Error("Profile not found");
+  }
+
+  if (!selectedWorkspace) {
+    throw new Error("Workspace not found");
+  }
+
+  if (!messageContent) {
+    throw new Error("Message content not found");
+  }
+};
+
 export const fetchChatResponse = async (
   url: string,
   body: object,
   isHosted: boolean,
   controller: AbortController,
-  setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>,
-  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>
+  setIsGenerating: (isGenerating: boolean) => void,
+  setChatMessages: (chatMessages: ChatMessage[]) => void
 ) => {
   const response = await fetch(url, {
     method: "POST",
@@ -59,9 +91,9 @@ export const processResponse = async (
   lastChatMessage: ChatMessage,
   isHosted: boolean,
   controller: AbortController,
-  setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
-  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
-  setToolInUse: React.Dispatch<React.SetStateAction<string>>
+  setFirstTokenReceived: (isFirstTokenReceived: boolean) => void,
+  setChatMessages: (chatMessages: ChatMessage[]) => void,
+  setToolInUse: (toolInUse: string) => void
 ) => {
   let fullText = "";
   let contentToAdd = "";
@@ -195,7 +227,7 @@ export const createTempMessages = (
   chatSettings: ChatSettings,
   b64Images: string[],
   isRegeneration: boolean,
-  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
+  setChatMessages: (chatMessages: ChatMessage[]) => void,
   selectedAssistant: Assistants | null
 ) => {
   let tempUserChatMessage: ChatMessage = {
@@ -308,10 +340,10 @@ export const handleHostedChat = async (
   newAbortController: AbortController,
   newMessageImages: MessageImage[],
   chatImages: MessageImage[],
-  setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>,
-  setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
-  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
-  setToolInUse: React.Dispatch<React.SetStateAction<string>>
+  setIsGenerating: (isGenerating: boolean) => void,
+  setFirstTokenReceived: (firstTokenReceived: boolean) => void,
+  setChatMessages: (chatMessages: ChatMessage[]) => void,
+  setToolInUse: (toolInUse: string) => void
 ) => {
   const provider =
     modelData.provider === "openai" && profile.use_azure_openai
@@ -359,6 +391,137 @@ export const handleHostedChat = async (
     setChatMessages,
     setToolInUse
   );
+};
+
+export const handleCreateMessages = async (
+  chatMessages: ChatMessage[],
+  currentChat: Chats,
+  profile: Profiles,
+  modelData: LLM,
+  messageContent: string,
+  generatedText: string,
+  newMessageImages: MessageImage[],
+  isRegeneration: boolean,
+  retrievedFileItems: FileItems[],
+  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
+  setChatFileItems: React.Dispatch<React.SetStateAction<FileItems[]>>,
+  setChatImages: React.Dispatch<React.SetStateAction<MessageImage[]>>,
+  selectedAssistant: Assistants | null
+) => {
+  const finalUserMessage: Messages = {
+    chat_id: currentChat.id,
+    assistant_id: null,
+    user_id: profile.user_id,
+    content: messageContent,
+    model: modelData.modelId,
+    role: "user",
+    sequence_number: chatMessages.length,
+    image_paths: [],
+    created_at: "", // 디비용 날짜
+    id: "", // 디비용 id
+    updated_at: null, // 디비용 날짜
+  };
+
+  const finalAssistantMessage: Messages = {
+    chat_id: currentChat.id,
+    assistant_id: selectedAssistant?.id || null,
+    user_id: profile.user_id,
+    content: generatedText,
+    model: modelData.modelId,
+    role: "assistant",
+    sequence_number: chatMessages.length + 1,
+    image_paths: [],
+    created_at: "", // 디비용 날짜
+    id: "", // 디비용 id
+    updated_at: null, // 디비용 날짜
+  };
+
+  let finalChatMessages: ChatMessage[] = [];
+
+  if (isRegeneration) {
+    const lastStartingMessage = chatMessages[chatMessages.length - 1].message;
+
+    const updatedMessage = await updateMessage(lastStartingMessage.id, {
+      ...lastStartingMessage,
+      content: generatedText,
+    });
+
+    chatMessages[chatMessages.length - 1].message = updatedMessage;
+
+    finalChatMessages = [...chatMessages];
+
+    setChatMessages(finalChatMessages);
+  } else {
+    const createdMessages = await createMessages([
+      finalUserMessage,
+      finalAssistantMessage,
+    ]);
+
+    // Upload each image (stored in newMessageImages) for the user message to message_images bucket
+    const uploadPromises = newMessageImages
+      .filter((obj) => obj.file !== null)
+      .map((obj) => {
+        let filePath = `${profile.user_id}/${currentChat.id}/${
+          createdMessages[0].id
+        }/${uuidv4()}`;
+
+        return uploadMessageImage(filePath, obj.file as File).catch((error) => {
+          console.error(`Failed to upload image at ${filePath}:`, error);
+          return null;
+        });
+      });
+
+    const paths = (await Promise.all(uploadPromises)).filter(
+      Boolean
+    ) as string[];
+
+    setChatImages((prevImages) => [
+      ...prevImages,
+      ...newMessageImages.map((obj, index) => ({
+        ...obj,
+        messageId: createdMessages[0].id,
+        path: paths[index],
+      })),
+    ]);
+
+    const updatedMessage = await updateMessage(createdMessages[0].id, {
+      ...createdMessages[0],
+      image_paths: paths,
+    });
+
+    const createdMessageFileItems = await createMessageFileItems(
+      retrievedFileItems.map((fileItem) => {
+        return {
+          user_id: profile.user_id,
+          message_id: createdMessages[1].id,
+          file_item_id: fileItem.id,
+        };
+      })
+    );
+
+    finalChatMessages = [
+      ...chatMessages,
+      {
+        message: updatedMessage,
+        fileItems: [],
+      },
+      {
+        message: createdMessages[1],
+        fileItems: retrievedFileItems.map((fileItem) => fileItem.id),
+      },
+    ];
+
+    setChatFileItems((prevFileItems) => {
+      const newFileItems = retrievedFileItems.filter(
+        (fileItem) =>
+          !prevFileItems.some((prevItem) => prevItem.id === fileItem.id)
+      );
+
+      return [...prevFileItems, ...newFileItems];
+    });
+
+    setChatMessages(finalChatMessages);
+  }
 };
 
 // export const fetchChatResponse = async (
