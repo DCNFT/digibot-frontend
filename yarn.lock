@@ -12,6 +12,21 @@
   resolved "https://registry.npmjs.org/@alloc/quick-lru/-/quick-lru-5.2.0.tgz"
   integrity sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==
 
+"@anthropic-ai/sdk@^0.18.0":
+  version "0.18.0"
+  resolved "https://registry.yarnpkg.com/@anthropic-ai/sdk/-/sdk-0.18.0.tgz#b351c0fe5a2ea37810ab0a19e7b52d1e9b42c4a5"
+  integrity sha512-3XsWEn/4nPGRd4AdSguugbSDFy6Z2AWTNOeI3iK+aV22+w23+vY9CEb3Hiy0kvKIQuxSmZz/+5WKC8nPWy8gVg==
+  dependencies:
+    "@types/node" "^18.11.18"
+    "@types/node-fetch" "^2.6.4"
+    abort-controller "^3.0.0"
+    agentkeepalive "^4.2.1"
+    digest-fetch "^1.3.0"
+    form-data-encoder "1.7.2"
+    formdata-node "^4.3.2"
+    node-fetch "^2.6.7"
+    web-streams-polyfill "^3.2.1"
+
 "@babel/runtime@^7.12.5", "@babel/runtime@^7.13.10", "@babel/runtime@^7.20.7", "@babel/runtime@^7.3.1":
   version "7.23.1"
   resolved "https://registry.npmjs.org/@babel/runtime/-/runtime-7.23.1.tgz"
@@ -96,6 +111,11 @@
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/@floating-ui/utils/-/utils-0.2.1.tgz#16308cea045f0fc777b6ff20a9f25474dd8293d2"
   integrity sha512-9TANp6GPoMtYzQdt54kfAyMmz1+osLlXdg2ENroU7zzrtflTLrrC/lgrIfaSe+Wu0b89GKccT7vxXA0MoAIO+Q==
+
+"@google/generative-ai@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@google/generative-ai/-/generative-ai-0.3.1.tgz#327b7f6df0d456205d44ad4237d7278e673984d5"
+  integrity sha512-Zh1EK5nCWqIhxPm3K1KOM2mOwwgBvp6lkze74yTj6+Zqibtf55Db1q87cbbzWZeET3ZbNgHMYjVf2JyMM6pI7A==
 
 "@hookform/resolvers@^3.3.2":
   version "3.3.4"
@@ -1986,6 +2006,13 @@ gopd@^1.0.1:
   dependencies:
     get-intrinsic "^1.1.3"
 
+gpt-tokenizer@^2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/gpt-tokenizer/-/gpt-tokenizer-2.1.2.tgz#14f7ce424cf2309fb5be66e112d1836080c2791a"
+  integrity sha512-HSuI5d6uey+c7x/VzQlPfCoGrfLyAc28vxWofKbjR9PJHm0AjQGSWkKw/OJnb+8S1g7nzgRsf0WH3dK+NNWYbg==
+  dependencies:
+    rfc4648 "^1.5.2"
+
 graceful-fs@^4.1.2, graceful-fs@^4.2.4:
   version "4.2.11"
   resolved "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.11.tgz"
@@ -3741,6 +3768,11 @@ reusify@^1.0.4:
   version "1.0.4"
   resolved "https://registry.npmjs.org/reusify/-/reusify-1.0.4.tgz"
   integrity sha512-U9nH88a3fc/ekCF1l0/UP1IosiuIjyTh7hBvXVMHYgVcfGvt897Xguj2UOLDeI5BG2m7/uwyaLVT6fbtCwTyzw==
+
+rfc4648@^1.5.2:
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/rfc4648/-/rfc4648-1.5.3.tgz#e62b81736c10361ca614efe618a566e93d0b41c0"
+  integrity sha512-MjOWxM065+WswwnmNONOT+bD1nXzY9Km6u3kzvnx8F8/HXGZdz3T6e6vZJ8Q/RIMUSp/nxqjH3GwvJDy8ijeQQ==
 
 rimraf@^3.0.2:
   version "3.0.2"
