@@ -88,7 +88,8 @@ export const useChatHandler = () => {
 
       const newAbortController = new AbortController();
       setAbortController(newAbortController);
-
+      console.log('[seo][handleSendMessage] chatSettings', chatSettings);
+      console.log('[sep] LLM_LIST = ', LLM_LIST);
       const modelData = [
         ...models.map((model) => ({
           modelId: model.model_id as LLMID,
@@ -102,6 +103,8 @@ export const useChatHandler = () => {
         // ...availableLocalModels,
         // ...availableOpenRouterModels,
       ].find((llm) => llm.modelId === chatSettings?.model);
+
+      console.log('[seo][handleSendMessage] modelData', modelData);
 
       validateChatSettings(
         chatSettings,
@@ -152,7 +155,7 @@ export const useChatHandler = () => {
         messageFileItems: retrievedFileItems,
         chatFileItems: chatFileItems,
       };
-
+      console.log('[seo] payload= ', payload);
       let generatedText = '';
 
       // if (selectedTools.length > 0) {
@@ -237,6 +240,7 @@ export const useChatHandler = () => {
           setChats,
           //setChatFiles,
         );
+        console.log('[seo][handleSendMessage] currentChat', currentChat);
       } else {
         // const updatedChat = await updateChat(currentChat.id, {
         //   updated_at: new Date().toISOString(),
@@ -312,7 +316,7 @@ export const useChatHandler = () => {
 
   return {
     chatInputRef,
-    prompt,
+    //prompt,
     // handleNewChat,
     handleSendMessage,
     // handleFocusChatInput,

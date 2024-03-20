@@ -2,6 +2,8 @@ import { FormEvent, useEffect, useRef, useState } from 'react';
 import HiddenButtons from './HiddenButtons';
 import { useChatHandler } from '@/hooks/useChatHandler';
 import useChatStore from '@/store/useChatStoreMig';
+import { TextareaAutosize } from '@/components/ui/textareaAutosize';
+import { usePromptAndCommand } from '@/hooks/use-prompt-and-command';
 
 type ChatInputProps = {
   handleSubmit?: (e: FormEvent) => void;
@@ -10,15 +12,16 @@ type ChatInputProps = {
 const ChatInput = ({ handleSubmit }: ChatInputProps) => {
   const { chatInputRef, handleSendMessage, handleStopMessage } =
     useChatHandler();
-
+  const { handleInputChange } = usePromptAndCommand();
   const userInput = useChatStore((state) => state.userInput);
-  const setUserInput = useChatStore((state) => state.setUserInput);
   const chatMessages = useChatStore((state) => state.chatMessages);
-  const handleInput = (value: string) => {};
 
   const [isTyping, setIsTyping] = useState(false);
+
   const handleKeyDown = (event: React.KeyboardEvent) => {
+    console.log('[seo] handleKeyDown');
     if (!isTyping && event.key === 'Enter' && !event.shiftKey) {
+      console.log('[seo] enter');
       event.preventDefault();
       // setIsPromptPickerOpen(false);
       handleSendMessage(userInput, chatMessages, false);
@@ -53,37 +56,25 @@ const ChatInput = ({ handleSubmit }: ChatInputProps) => {
 
   return (
     <div className="input-container">
-      <HiddenButtons
+      {/* <HiddenButtons
         isShowHiddenButton={isShowHiddenButton}
         handleOptionButton={handleOptionButton}
         handleSubmit={handleSubmit}
+      /> */}
+
+      <TextareaAutosize
+        textareaRef={chatInputRef}
+        className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+        placeholder={`XD-BOT에게 질문해보세요~`}
+        onValueChange={handleInputChange}
+        value={userInput}
+        minRows={1}
+        maxRows={18}
+        onKeyDown={handleKeyDown}
+        // onPaste={handlePaste}
+        // onCompositionStart={() => setIsTyping(true)}
+        // onCompositionEnd={() => setIsTyping(false)}
       />
-      <form id="chat-form" onSubmit={handleSubmit}>
-        <div className="input-container">
-          <input
-            // ref={chatInputRef}
-            type="text"
-            id="user-input"
-            onChange={(e) => handleInput(e.target.value)}
-            value={userInput}
-            onKeyDown={handleKeyDown}
-            placeholder="메시지를 입력하세요..."
-          />
-          {/* <button
-            type="button"
-            className="show-options-btn"
-            onClick={handleOptionButton}
-          >
-            #
-          </button> */}
-          <input
-            type="submit"
-            id="send-button"
-            className="send_btn"
-            value="" // defaultValue 대신 value 사용, 버튼에 표시될 텍스트
-          />
-        </div>
-      </form>
     </div>
   );
 };

@@ -377,6 +377,9 @@ export const handleHostedChat = async (
     customModelId: provider === 'custom' ? modelData.hostedId : '',
   };
 
+  console.log('apiEndpoint=', apiEndpoint);
+  console.log('requestBody=', requestBody);
+
   const response = await fetchChatResponse(
     apiEndpoint,
     requestBody,

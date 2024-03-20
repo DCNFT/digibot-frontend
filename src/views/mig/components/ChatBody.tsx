@@ -15,20 +15,26 @@ const ChatBody = () => {
   useEffect(() => {
     scrollToBottom();
   }, [chatMessages]); // Scroll to bottom every time chatData changes
+  // console.log(
+  //   '[seo][chatbody] chatMessages',
+  //   chatMessages.sort(
+  //     (a, b) => a.message.sequence_number - b.message.sequence_number,
+  //   ),
+  // );
+
+  //TypeError: Cannot assign to read only property '0' of object '[object Array]'
 
   return (
     <div id="chatbox">
-      {chatMessages
-        .sort((a, b) => a.message.sequence_number - b.message.sequence_number)
-        .map((chatMessage, index, array) => {
-          return (
-            <ChatMessage
-              key={chatMessage.message.sequence_number}
-              message={chatMessage.message} // Fix: Update the type of the message prop
-              isLast={index === array.length - 1}
-            />
-          );
-        })}
+      {chatMessages?.map((chatMessage, index, array) => {
+        return (
+          <ChatMessage
+            key={chatMessage.message.sequence_number}
+            message={chatMessage.message} // Fix: Update the type of the message prop
+            isLast={index === array.length - 1}
+          />
+        );
+      })}
       <div ref={messagesEndRef} />
     </div>
   );

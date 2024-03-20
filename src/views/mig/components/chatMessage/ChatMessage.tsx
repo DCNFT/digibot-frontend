@@ -25,7 +25,7 @@ const ChatMessage = ({ message, isLast }: ChatMessageProps) => {
 
   return (
     <div className="message-container">
-      <div className={chatMessageClass}></div>
+      <div className={chatMessageClass}>{message?.content}</div>
     </div>
   );
 };

@@ -71,7 +71,7 @@ const initialState: State = {
   abortController: new AbortController(),
   models: [],
   chatSettings: {
-    model: 'gpt-4-1106-preview' as LLMID,
+    model: 'gpt-3.5-turbo' as LLMID,
     prompt: 'You are a friendly, helpful AI assistant.',
     temperature: 0.5,
     contextLength: 4096,
@@ -88,6 +88,7 @@ const initialState: State = {
   selectedAssistant: {} as Assistants,
   chatFileItems: [],
   chatImages: [],
+  chatFiles: [],
 };
 
 const useChatStore = create(
