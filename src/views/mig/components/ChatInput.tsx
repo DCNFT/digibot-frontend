@@ -1,30 +1,27 @@
-import useChatStore from "@/store/useChatStore";
-import { FormEvent, useEffect, useRef, useState } from "react";
-import HiddenButtons from "./HiddenButtons";
+import { FormEvent, useEffect, useRef, useState } from 'react';
+import HiddenButtons from './HiddenButtons';
+import { useChatHandler } from '@/hooks/useChatHandler';
+import useChatStore from '@/store/useChatStoreMig';
 
 type ChatInputProps = {
   handleSubmit?: (e: FormEvent) => void;
 };
 
 const ChatInput = ({ handleSubmit }: ChatInputProps) => {
-  const prompt = useChatStore((state) => state.prompt);
-  const setPrompt = useChatStore((state) => state.setPrompt);
-  const isGenerating = useChatStore((state) => state.isGenerating);
+  const { chatInputRef, handleSendMessage, handleStopMessage } =
+    useChatHandler();
 
-  const handleInput = (value: string) => {
-    setPrompt(value);
-  };
+  const userInput = useChatStore((state) => state.userInput);
+  const setUserInput = useChatStore((state) => state.setUserInput);
+  const chatMessages = useChatStore((state) => state.chatMessages);
+  const handleInput = (value: string) => {};
 
-  const chatInputRef = useRef<HTMLTextAreaElement>(null);
   const [isTyping, setIsTyping] = useState(false);
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === "Enter" && !event.shiftKey) {
-      if (!isGenerating) {
-        // isGenerating 상태가 false일 때만 폼 제출을 허용합니다.
-      } else {
-        // isGenerating 상태가 true이면 폼 제출을 방지합니다.
-        event.preventDefault();
-      }
+    if (!isTyping && event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      // setIsPromptPickerOpen(false);
+      handleSendMessage(userInput, chatMessages, false);
     }
   };
 
@@ -34,15 +31,15 @@ const ChatInput = ({ handleSubmit }: ChatInputProps) => {
       const handleCompositionStart = () => setIsTyping(true);
       const handleCompositionEnd = () => setIsTyping(false);
 
-      textarea.addEventListener("compositionstart", handleCompositionStart);
-      textarea.addEventListener("compositionend", handleCompositionEnd);
+      textarea.addEventListener('compositionstart', handleCompositionStart);
+      textarea.addEventListener('compositionend', handleCompositionEnd);
 
       return () => {
         textarea.removeEventListener(
-          "compositionstart",
-          handleCompositionStart
+          'compositionstart',
+          handleCompositionStart,
         );
-        textarea.removeEventListener("compositionend", handleCompositionEnd);
+        textarea.removeEventListener('compositionend', handleCompositionEnd);
       };
     }
   }, [chatInputRef]);
@@ -50,7 +47,7 @@ const ChatInput = ({ handleSubmit }: ChatInputProps) => {
   const [isShowHiddenButton, setIsShowHiddenButton] = useState(false);
   const handleOptionButton = (e: any) => {
     e.preventDefault();
-    console.log("handleOptionButton");
+    console.log('handleOptionButton');
     setIsShowHiddenButton(!isShowHiddenButton);
   };
 
@@ -68,7 +65,7 @@ const ChatInput = ({ handleSubmit }: ChatInputProps) => {
             type="text"
             id="user-input"
             onChange={(e) => handleInput(e.target.value)}
-            value={prompt}
+            value={userInput}
             onKeyDown={handleKeyDown}
             placeholder="메시지를 입력하세요..."
           />

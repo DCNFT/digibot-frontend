@@ -1,6 +1,6 @@
-import { Message } from "postcss";
+import { Messages } from '@/types';
 
 export interface ChatMessage {
-  message: Message;
+  message: Messages;
   fileItems: string[];
 }

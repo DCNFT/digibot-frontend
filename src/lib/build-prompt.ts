@@ -7,16 +7,16 @@ import {
   MessageImage,
   Messages,
   Profiles,
-} from "@/types";
-import { encode } from "gpt-tokenizer";
+} from '@/types';
+import { encode } from 'gpt-tokenizer';
 
 const buildBasePrompt = (
   prompt: string,
   profileContext: string,
   workspaceInstructions: string,
-  assistant: Assistants | null
+  assistant: Assistants | null,
 ) => {
-  let fullPrompt = "";
+  let fullPrompt = '';
 
   if (assistant) {
     fullPrompt += `<INJECT ROLE>\nYou are not an AI. You are ${assistant.name}.\n</INJECT ROLE>\n\n`;
@@ -40,7 +40,7 @@ const buildBasePrompt = (
 export async function buildFinalMessages(
   payload: ChatPayload,
   profile: Profiles,
-  chatImages: MessageImage[]
+  chatImages: MessageImage[],
 ) {
   const {
     chatSettings,
@@ -53,9 +53,9 @@ export async function buildFinalMessages(
 
   const BUILT_PROMPT = buildBasePrompt(
     chatSettings.prompt,
-    chatSettings.includeProfileContext ? profile.profile_context || "" : "",
-    chatSettings.includeWorkspaceInstructions ? workspaceInstructions : "",
-    assistant
+    chatSettings.includeProfileContext ? profile.profile_context || '' : '',
+    chatSettings.includeWorkspaceInstructions ? workspaceInstructions : '',
+    assistant,
   );
 
   const CHUNK_SIZE = chatSettings.contextLength;
@@ -78,7 +78,7 @@ export async function buildFinalMessages(
     if (nextChatMessageFileItems.length > 0) {
       const findFileItems = nextChatMessageFileItems
         .map((fileItemId) =>
-          chatFileItems.find((chatFileItem) => chatFileItem.id === fileItemId)
+          chatFileItems.find((chatFileItem) => chatFileItem.id === fileItemId),
         )
         .filter((item) => item !== undefined) as FileItems[];
 
@@ -113,17 +113,17 @@ export async function buildFinalMessages(
   }
 
   let tempSystemMessage: Messages = {
-    chat_id: "",
+    chat_id: '',
     assistant_id: null,
     content: BUILT_PROMPT,
-    created_at: "",
-    id: processedChatMessages.length + "",
+    created_at: '',
+    id: processedChatMessages.length + '',
     image_paths: [],
     model: payload.chatSettings.model,
-    role: "system",
+    role: 'system',
     sequence_number: processedChatMessages.length,
-    updated_at: "",
-    user_id: "",
+    updated_at: '',
+    user_id: '',
   };
 
   finalMessages.unshift(tempSystemMessage);
@@ -134,13 +134,13 @@ export async function buildFinalMessages(
     if (message.image_paths.length > 0) {
       content = [
         {
-          type: "text",
+          type: 'text',
           text: message.content,
         },
         ...message.image_paths.map((path: string) => {
-          let formedUrl = "";
+          let formedUrl = '';
 
-          if (path.startsWith("data")) {
+          if (path.startsWith('data')) {
             formedUrl = path;
           } else {
             const chatImage = chatImages.find((image) => image.path === path);
@@ -151,7 +151,7 @@ export async function buildFinalMessages(
           }
 
           return {
-            type: "image_url",
+            type: 'image_url',
             image_url: formedUrl,
           };
         }),
@@ -183,7 +183,7 @@ export async function buildFinalMessages(
 function buildRetrievalText(fileItems: FileItems[]) {
   const retrievalText = fileItems
     .map((item) => `<BEGIN SOURCE>\n${item.content}\n</END SOURCE>`)
-    .join("\n\n");
+    .join('\n\n');
 
   return `You may use the following sources if needed to answer the user's question. If you don't know the answer, say "I don't know."\n\n${retrievalText}`;
 }
@@ -191,16 +191,16 @@ function buildRetrievalText(fileItems: FileItems[]) {
 export async function buildGoogleGeminiFinalMessages(
   payload: ChatPayload,
   profile: Profiles,
-  messageImageFiles: MessageImage[]
+  messageImageFiles: MessageImage[],
 ) {
   const { chatSettings, workspaceInstructions, chatMessages, assistant } =
     payload;
 
   const BUILT_PROMPT = buildBasePrompt(
     chatSettings.prompt,
-    chatSettings.includeProfileContext ? profile.profile_context || "" : "",
-    chatSettings.includeWorkspaceInstructions ? workspaceInstructions : "",
-    assistant
+    chatSettings.includeProfileContext ? profile.profile_context || '' : '',
+    chatSettings.includeWorkspaceInstructions ? workspaceInstructions : '',
+    assistant,
   );
 
   let finalMessages = [];
@@ -226,38 +226,38 @@ export async function buildGoogleGeminiFinalMessages(
   }
 
   let tempSystemMessage: Messages = {
-    chat_id: "",
+    chat_id: '',
     assistant_id: null,
     content: BUILT_PROMPT,
-    created_at: "",
-    id: chatMessages.length + "",
+    created_at: '',
+    id: chatMessages.length + '',
     image_paths: [],
     model: payload.chatSettings.model,
-    role: "system",
+    role: 'system',
     sequence_number: chatMessages.length,
-    updated_at: "",
-    user_id: "",
+    updated_at: '',
+    user_id: '',
   };
 
   finalMessages.unshift(tempSystemMessage);
 
   let GOOGLE_FORMATTED_MESSAGES = [];
 
-  if (chatSettings.model === "gemini-pro") {
+  if (chatSettings.model === 'gemini-pro') {
     GOOGLE_FORMATTED_MESSAGES = [
       {
-        role: "user",
+        role: 'user',
         parts: finalMessages[0].content,
       },
       {
-        role: "model",
-        parts: "I will follow your instructions.",
+        role: 'model',
+        parts: 'I will follow your instructions.',
       },
     ];
 
     for (let i = 1; i < finalMessages.length; i++) {
       GOOGLE_FORMATTED_MESSAGES.push({
-        role: finalMessages[i].role === "user" ? "user" : "model",
+        role: finalMessages[i].role === 'user' ? 'user' : 'model',
         parts: finalMessages[i].content as string,
       });
     }

@@ -8,30 +8,29 @@
 // import { buildFinalMessages } from "@/lib/build-prompt";
 // import { Tables } from "@/supabase/types";
 // import { ChatMessage, ChatPayload, LLMID, ModelProvider } from "@/types";
-import { useRouter } from "next/navigation";
+import { useRouter } from 'next/navigation';
 // import { useContext, useEffect, useRef } from "react";
 import {
   createTempMessages,
   handleCreateMessages,
-  // handleCreateChat,
-  // handleCreateMessages,
+  handleCreateChat,
   handleHostedChat,
-  handleLocalChat,
+  // handleLocalChat,
   // handleRetrieval,
   processResponse,
   validateChatSettings,
   // validateChatSettings,
-} from "@/lib/chat";
+} from '@/lib/chat';
 import {
   ChatMessage,
   ChatPayload,
   FileItems,
   LLMID,
   ModelProvider,
-} from "@/types";
-import useChatStore from "@/store/useChatStoreMig";
-import { LLM_LIST } from "@/lib/models/llm/llm-list";
-import { useRef } from "react";
+} from '@/types';
+import useChatStore from '@/store/useChatStoreMig';
+import { LLM_LIST } from '@/lib/models/llm/llm-list';
+import { useRef } from 'react';
 
 export const useChatHandler = () => {
   const router = useRouter();
@@ -40,14 +39,14 @@ export const useChatHandler = () => {
   const setUserInput = useChatStore((state) => state.setUserInput);
   const setIsGenerating = useChatStore((state) => state.setIsGenerating);
   const setIsPromptPickerOpen = useChatStore(
-    (state) => state.setIsPromptPickerOpen
+    (state) => state.setIsPromptPickerOpen,
   );
   const setIsFilePickerOpen = useChatStore(
-    (state) => state.setIsFilePickerOpen
+    (state) => state.setIsFilePickerOpen,
   );
   const newMessageImages = useChatStore((state) => state.newMessageImages);
   const setNewMessageImages = useChatStore(
-    (state) => state.setNewMessageImages
+    (state) => state.setNewMessageImages,
   );
   const abortController = useChatStore((state) => state.abortController);
   const setAbortController = useChatStore((state) => state.setAbortController);
@@ -61,19 +60,27 @@ export const useChatHandler = () => {
   const setChatMessages = useChatStore((state) => state.setChatMessages);
   const selectedAssistant = useChatStore((state) => state.selectedAssistant);
   const setFirstTokenReceived = useChatStore(
-    (state) => state.setFirstTokenReceived
+    (state) => state.setFirstTokenReceived,
   );
+  const chatFileItems = useChatStore((state) => state.chatFileItems);
+  const chatImages = useChatStore((state) => state.chatImages);
   const setToolInUse = useChatStore((state) => state.setToolInUse);
+  const removeLastTwoChatMessages = useChatStore(
+    (state) => state.removeLastTwoChatMessages,
+  );
+  const updateChatMessageContent = useChatStore(
+    (state) => state.updateChatMessageContent,
+  );
 
   const handleSendMessage = async (
     messageContent: string,
     chatMessages: ChatMessage[],
-    isRegeneration: boolean
+    isRegeneration: boolean,
   ) => {
     const startingInput = messageContent;
 
     try {
-      setUserInput("");
+      setUserInput('');
       setIsGenerating(true);
       setIsPromptPickerOpen(false);
       setIsFilePickerOpen(false);
@@ -86,9 +93,9 @@ export const useChatHandler = () => {
         ...models.map((model) => ({
           modelId: model.model_id as LLMID,
           modelName: model.name,
-          provider: "custom" as ModelProvider,
+          provider: 'custom' as ModelProvider,
           hostedId: model.id,
-          platformLink: "",
+          platformLink: '',
           imageInput: false,
         })),
         ...LLM_LIST,
@@ -101,7 +108,7 @@ export const useChatHandler = () => {
         modelData,
         profile,
         selectedWorkspace,
-        messageContent
+        messageContent,
       );
 
       let currentChat = selectedChat ? { ...selectedChat } : null;
@@ -133,12 +140,11 @@ export const useChatHandler = () => {
           b64Images,
           isRegeneration,
           setChatMessages,
-          selectedAssistant
         );
 
       let payload: ChatPayload = {
         chatSettings: chatSettings!,
-        workspaceInstructions: selectedWorkspace!.instructions || "",
+        workspaceInstructions: selectedWorkspace!.instructions || '',
         chatMessages: isRegeneration
           ? [...chatMessages]
           : [...chatMessages, tempUserChatMessage],
@@ -147,7 +153,7 @@ export const useChatHandler = () => {
         chatFileItems: chatFileItems,
       };
 
-      let generatedText = "";
+      let generatedText = '';
 
       // if (selectedTools.length > 0) {
       //   setToolInUse("Tools");
@@ -186,7 +192,7 @@ export const useChatHandler = () => {
       // }
 
       // else {
-      if (modelData!.provider === "ollama") {
+      if (modelData!.provider === 'ollama') {
         // generatedText = await handleLocalChat(
         //   payload,
         //   profile!,
@@ -211,37 +217,46 @@ export const useChatHandler = () => {
           chatImages,
           setIsGenerating,
           setFirstTokenReceived,
-          setChatMessages,
-          setToolInUse
+          removeLastTwoChatMessages,
+          updateChatMessageContent,
+          setToolInUse,
         );
       }
       // }
 
-      // if (!currentChat) {
-      //   currentChat = await handleCreateChat(
-      //     chatSettings!,
-      //     profile!,
-      //     selectedWorkspace!,
-      //     messageContent,
-      //     selectedAssistant!,
-      //     newMessageFiles,
-      //     setSelectedChat,
-      //     setChats,
-      //     setChatFiles
-      //   );
-      // } else {
-      const updatedChat = await updateChat(currentChat.id, {
-        updated_at: new Date().toISOString(),
-      });
-
-      setChats((prevChats) => {
-        const updatedChats = prevChats.map((prevChat) =>
-          prevChat.id === updatedChat.id ? updatedChat : prevChat
+      if (!currentChat) {
+        currentChat = await handleCreateChat(
+          chatSettings!,
+          profile!,
+          selectedWorkspace!,
+          messageContent,
+          selectedAssistant!,
+          //newMessageFiles,
+          setSelectedChat,
+          chats,
+          setChats,
+          //setChatFiles,
         );
+      } else {
+        // const updatedChat = await updateChat(currentChat.id, {
+        //   updated_at: new Date().toISOString(),
+        // });
 
-        return updatedChats;
-      });
-      //}
+        const updatedChat = chats.map((chat) => {
+          if (currentChat?.id === chat.id) {
+            return { ...chat, updated_at: new Date().toISOString() };
+          }
+          return chat;
+        });
+
+        setChats(updatedChat);
+        // setChats((prevChats) => {
+        //   const updatedChats = prevChats.map((prevChat) =>
+        //     prevChat.id === updatedChat.id ? updatedChat : prevChat,
+        //   );
+        //   return updatedChats;
+        // });
+      }
 
       await handleCreateMessages(
         chatMessages,
@@ -254,14 +269,14 @@ export const useChatHandler = () => {
         isRegeneration,
         retrievedFileItems,
         setChatMessages,
-        setChatFileItems,
-        setChatImages,
-        selectedAssistant
+        // setChatFileItems,
+        // setChatImages,
+        selectedAssistant,
       );
 
       setIsGenerating(false);
       setFirstTokenReceived(false);
-      setUserInput("");
+      setUserInput('');
     } catch (error) {
       setIsGenerating(false);
       setFirstTokenReceived(false);

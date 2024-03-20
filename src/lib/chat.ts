@@ -1,5 +1,8 @@
+import { createDocXFile } from './../db/files';
+import { create } from 'zustand';
 import {
   Assistants,
+  ChatFile,
   ChatMessage,
   ChatPayload,
   ChatSettings,
@@ -11,46 +14,49 @@ import {
   Messages,
   Profiles,
   Workspaces,
-} from "@/types";
-import { consumeReadableStream } from "./consumeStream";
+} from '@/types';
+import { consumeReadableStream } from './consumeStream';
 import {
   CHAT_BOT_DEFAULT_ID,
   CHAT_USER_DEFAULT_ID,
   SYSTEM_MESSAGE,
   SYSTEM_MESSAGE_LAB,
-} from "@/constants/default";
-import { v4 as uuidv4 } from "uuid";
-import { Profile } from "@/types/daouOffice";
+} from '@/constants/default';
+import { v4 as uuidv4 } from 'uuid';
+import { Profile } from '@/types/daouOffice';
 import {
   buildFinalMessages,
   buildGoogleGeminiFinalMessages,
-} from "./build-prompt";
+} from './build-prompt';
+import { createMessages, updateMessage } from '@/db/messages';
+import { uploadMessageImage } from '@/db/storage/message-images';
+import { createMessageFileItems } from '@/db/message-file-items';
 
 export const validateChatSettings = (
   chatSettings: ChatSettings | null,
   modelData: LLM | undefined,
   profile: Profiles | null,
   selectedWorkspace: Workspaces | null,
-  messageContent: string
+  messageContent: string,
 ) => {
   if (!chatSettings) {
-    throw new Error("Chat settings not found");
+    throw new Error('Chat settings not found');
   }
 
   if (!modelData) {
-    throw new Error("Model not found");
+    throw new Error('Model not found');
   }
 
   if (!profile) {
-    throw new Error("Profile not found");
+    throw new Error('Profile not found');
   }
 
   if (!selectedWorkspace) {
-    throw new Error("Workspace not found");
+    throw new Error('Workspace not found');
   }
 
   if (!messageContent) {
-    throw new Error("Message content not found");
+    throw new Error('Message content not found');
   }
 };
 
@@ -60,10 +66,10 @@ export const fetchChatResponse = async (
   isHosted: boolean,
   controller: AbortController,
   setIsGenerating: (isGenerating: boolean) => void,
-  setChatMessages: (chatMessages: ChatMessage[]) => void
+  removeLastTwoChatMessages: () => void,
 ) => {
   const response = await fetch(url, {
-    method: "POST",
+    method: 'POST',
     body: JSON.stringify(body),
     signal: controller.signal,
   });
@@ -80,7 +86,7 @@ export const fetchChatResponse = async (
     // toast.error(errorData.message);
 
     setIsGenerating(false);
-    setChatMessages((prevMessages) => prevMessages.slice(0, -2));
+    removeLastTwoChatMessages();
   }
 
   return response;
@@ -92,18 +98,19 @@ export const processResponse = async (
   isHosted: boolean,
   controller: AbortController,
   setFirstTokenReceived: (isFirstTokenReceived: boolean) => void,
-  setChatMessages: (chatMessages: ChatMessage[]) => void,
-  setToolInUse: (toolInUse: string) => void
+  // setChatMessages: (chatMessages: ChatMessage[]) => void,
+  updateChatMessageContent: (messageId: string, contentToAdd: string) => void,
+  setToolInUse: (toolInUse: string) => void,
 ) => {
-  let fullText = "";
-  let contentToAdd = "";
+  let fullText = '';
+  let contentToAdd = '';
 
   if (response.body) {
     await consumeReadableStream(
       response.body,
       (chunk) => {
         setFirstTokenReceived(true);
-        setToolInUse("none");
+        setToolInUse('none');
 
         try {
           contentToAdd = isHosted
@@ -114,53 +121,54 @@ export const processResponse = async (
               // separately.
               chunk
                 .trimEnd()
-                .split("\n")
+                .split('\n')
                 .reduce(
                   (acc, line) => acc + JSON.parse(line).message.content,
-                  ""
+                  '',
                 );
           fullText += contentToAdd;
         } catch (error) {
-          console.error("Error parsing JSON:", error);
+          console.error('Error parsing JSON:', error);
         }
 
-        setChatMessages((prev) =>
-          prev.map((chatMessage) => {
-            if (chatMessage.message.id === lastChatMessage.message.id) {
-              const updatedChatMessage: ChatMessage = {
-                message: {
-                  ...chatMessage.message,
-                  content: chatMessage.message.content + contentToAdd,
-                },
-                fileItems: chatMessage.fileItems,
-              };
+        // setChatMessages((prev) =>
+        //   prev.map((chatMessage) => {
+        //     if (chatMessage.message.id === lastChatMessage.message.id) {
+        //       const updatedChatMessage: ChatMessage = {
+        //         message: {
+        //           ...chatMessage.message,
+        //           content: chatMessage.message.content + contentToAdd,
+        //         },
+        //         fileItems: chatMessage.fileItems,
+        //       };
 
-              return updatedChatMessage;
-            }
+        //       return updatedChatMessage;
+        //     }
 
-            return chatMessage;
-          })
-        );
+        //     return chatMessage;
+        //   }),
+        // );
+        updateChatMessageContent(lastChatMessage.message.id, contentToAdd);
       },
-      controller.signal
+      controller.signal,
     );
 
     return fullText;
   } else {
-    throw new Error("Response body is null");
+    throw new Error('Response body is null');
   }
 };
 
 export const getBotLastId = (chatData: Message[]) => {
   const lastBotMessage = chatData.findLast(
-    (chatMessage) => chatMessage.role === "assistant"
+    (chatMessage) => chatMessage.role === 'assistant',
   );
   return lastBotMessage ? lastBotMessage.id : CHAT_BOT_DEFAULT_ID;
 };
 
 export const getUserLastId = (chatData: Message[]) => {
   const lastUserMessage = chatData.findLast(
-    (chatMessage) => chatMessage.role === "user"
+    (chatMessage) => chatMessage.role === 'user',
   );
   return lastUserMessage ? lastUserMessage.id : CHAT_USER_DEFAULT_ID;
 };
@@ -171,19 +179,19 @@ export const systemSettings = (
   prompt: string | undefined,
   menuNum: number,
   isLab = false,
-  profile?: Profile
+  profile?: Profile,
 ) => {
   if (USE_OPEN_AI_SERVER)
     return {
-      url: "/api/chat/openai",
+      url: '/api/chat/openai',
       setting: {
         chatSettings: {
           contextLength: 4096,
-          embeddingsProvider: "openai",
+          embeddingsProvider: 'openai',
           includeProfileContext: true,
           includeWorkspaceInstructions: true,
-          model: "gpt-3.5-turbo-1106",
-          prompt: "You are a friendly, helpful AI assistant.",
+          model: 'gpt-3.5-turbo-1106',
+          prompt: 'You are a friendly, helpful AI assistant.',
           temperature: 0.5,
         },
         menuNum: 4,
@@ -196,7 +204,7 @@ export const systemSettings = (
     let setting = {
       menu_num: menuNum || 5,
       chat_history: chatData
-        .filter(({ role }) => role !== "system") // 'system' 역할을 제외
+        .filter(({ role }) => role !== 'system') // 'system' 역할을 제외
         .map(({ id, ...rest }) => rest) // id 제외
         .slice(0, -2),
       query: prompt,
@@ -215,7 +223,7 @@ export const systemSettings = (
 
 export const getDefaultSystemMessage = (isLab = false) => {
   return {
-    role: "system",
+    role: 'system',
     content: isLab ? SYSTEM_MESSAGE_LAB : SYSTEM_MESSAGE,
     id: uuidv4(),
   };
@@ -228,40 +236,37 @@ export const createTempMessages = (
   b64Images: string[],
   isRegeneration: boolean,
   setChatMessages: (chatMessages: ChatMessage[]) => void,
-  selectedAssistant: Assistants | null
 ) => {
   let tempUserChatMessage: ChatMessage = {
     message: {
-      chat_id: "",
-      assistant_id: null,
+      chat_id: '',
       content: messageContent,
-      created_at: "",
+      created_at: '',
       id: uuidv4(),
       image_paths: b64Images,
       model: chatSettings.model,
-      role: "user",
+      role: 'user',
       sequence_number: chatMessages.length,
-      updated_at: "",
-      user_id: "",
-      type: "",
+      updated_at: '',
+      user_id: '',
+      assistant_id: null,
     },
     fileItems: [],
   };
 
   let tempAssistantChatMessage: ChatMessage = {
     message: {
-      chat_id: "",
-      assistant_id: selectedAssistant?.id || null,
-      content: "",
-      created_at: "",
+      chat_id: '',
+      content: '',
+      created_at: '',
       id: uuidv4(),
       image_paths: [],
       model: chatSettings.model,
-      role: "assistant",
+      role: 'assistant',
       sequence_number: chatMessages.length + 1,
-      updated_at: "",
-      user_id: "",
-      type: "",
+      updated_at: '',
+      user_id: '',
+      assistant_id: null,
     },
     fileItems: [],
   };
@@ -270,7 +275,7 @@ export const createTempMessages = (
 
   if (isRegeneration) {
     const lastMessageIndex = chatMessages.length - 1;
-    chatMessages[lastMessageIndex].message.content = "";
+    chatMessages[lastMessageIndex].message.content = '';
     newMessages = [...chatMessages];
   } else {
     newMessages = [
@@ -288,48 +293,48 @@ export const createTempMessages = (
   };
 };
 
-export const handleLocalChat = async (
-  payload: ChatPayload,
-  profile: Profiles,
-  chatSettings: ChatSettings,
-  tempAssistantMessage: ChatMessage,
-  isRegeneration: boolean,
-  newAbortController: AbortController,
-  setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>,
-  setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
-  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
-  setToolInUse: React.Dispatch<React.SetStateAction<string>>
-) => {
-  const formattedMessages = await buildFinalMessages(payload, profile, []);
+// export const handleLocalChat = async (
+//   payload: ChatPayload,
+//   profile: Profiles,
+//   chatSettings: ChatSettings,
+//   tempAssistantMessage: ChatMessage,
+//   isRegeneration: boolean,
+//   newAbortController: AbortController,
+//   setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>,
+//   setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
+//   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
+//   setToolInUse: React.Dispatch<React.SetStateAction<string>>,
+// ) => {
+//   const formattedMessages = await buildFinalMessages(payload, profile, []);
 
-  // Ollama API: https://github.com/jmorganca/ollama/blob/main/docs/api.md
-  const response = await fetchChatResponse(
-    process.env.NEXT_PUBLIC_OLLAMA_URL + "/api/chat",
-    {
-      model: chatSettings.model,
-      messages: formattedMessages,
-      options: {
-        temperature: payload.chatSettings.temperature,
-      },
-    },
-    false,
-    newAbortController,
-    setIsGenerating,
-    setChatMessages
-  );
+//   // Ollama API: https://github.com/jmorganca/ollama/blob/main/docs/api.md
+//   const response = await fetchChatResponse(
+//     process.env.NEXT_PUBLIC_OLLAMA_URL + '/api/chat',
+//     {
+//       model: chatSettings.model,
+//       messages: formattedMessages,
+//       options: {
+//         temperature: payload.chatSettings.temperature,
+//       },
+//     },
+//     false,
+//     newAbortController,
+//     setIsGenerating,
+//     setChatMessages,
+//   );
 
-  return await processResponse(
-    response,
-    isRegeneration
-      ? payload.chatMessages[payload.chatMessages.length - 1]
-      : tempAssistantMessage,
-    false,
-    newAbortController,
-    setFirstTokenReceived,
-    setChatMessages,
-    setToolInUse
-  );
-};
+//   return await processResponse(
+//     response,
+//     isRegeneration
+//       ? payload.chatMessages[payload.chatMessages.length - 1]
+//       : tempAssistantMessage,
+//     false,
+//     newAbortController,
+//     setFirstTokenReceived,
+//     setChatMessages,
+//     setToolInUse,
+//   );
+// };
 
 export const handleHostedChat = async (
   payload: ChatPayload,
@@ -342,33 +347,34 @@ export const handleHostedChat = async (
   chatImages: MessageImage[],
   setIsGenerating: (isGenerating: boolean) => void,
   setFirstTokenReceived: (firstTokenReceived: boolean) => void,
-  setChatMessages: (chatMessages: ChatMessage[]) => void,
-  setToolInUse: (toolInUse: string) => void
+  removeLastTwoChatMessages: () => void,
+  updateChatMessageContent: (messageId: string, contentToAdd: string) => void,
+  setToolInUse: (toolInUse: string) => void,
 ) => {
   const provider =
-    modelData.provider === "openai" && profile.use_azure_openai
-      ? "azure"
+    modelData.provider === 'openai' && profile.use_azure_openai
+      ? 'azure'
       : modelData.provider;
 
   let formattedMessages = [];
 
-  if (provider === "google") {
+  if (provider === 'google') {
     formattedMessages = await buildGoogleGeminiFinalMessages(
       payload,
       profile,
-      newMessageImages
+      newMessageImages,
     );
   } else {
     formattedMessages = await buildFinalMessages(payload, profile, chatImages);
   }
 
   const apiEndpoint =
-    provider === "custom" ? "/api/chat/custom" : `/api/chat/${provider}`;
+    provider === 'custom' ? '/api/chat/custom' : `/api/chat/${provider}`;
 
   const requestBody = {
     chatSettings: payload.chatSettings,
     messages: formattedMessages,
-    customModelId: provider === "custom" ? modelData.hostedId : "",
+    customModelId: provider === 'custom' ? modelData.hostedId : '',
   };
 
   const response = await fetchChatResponse(
@@ -377,7 +383,7 @@ export const handleHostedChat = async (
     true,
     newAbortController,
     setIsGenerating,
-    setChatMessages
+    removeLastTwoChatMessages,
   );
 
   return await processResponse(
@@ -388,8 +394,8 @@ export const handleHostedChat = async (
     true,
     newAbortController,
     setFirstTokenReceived,
-    setChatMessages,
-    setToolInUse
+    updateChatMessageContent,
+    setToolInUse,
   );
 };
 
@@ -403,10 +409,10 @@ export const handleCreateMessages = async (
   newMessageImages: MessageImage[],
   isRegeneration: boolean,
   retrievedFileItems: FileItems[],
-  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
-  setChatFileItems: React.Dispatch<React.SetStateAction<FileItems[]>>,
-  setChatImages: React.Dispatch<React.SetStateAction<MessageImage[]>>,
-  selectedAssistant: Assistants | null
+  setChatMessages: (chatMessages: ChatMessage[]) => void,
+  //setChatFileItems: (fileItems: FileItems[]) => void,
+  //setChatImages: (chatImages: MessageImage[]) => void,
+  selectedAssistant: Assistants | null,
 ) => {
   const finalUserMessage: Messages = {
     chat_id: currentChat.id,
@@ -414,11 +420,11 @@ export const handleCreateMessages = async (
     user_id: profile.user_id,
     content: messageContent,
     model: modelData.modelId,
-    role: "user",
+    role: 'user',
     sequence_number: chatMessages.length,
     image_paths: [],
-    created_at: "", // 디비용 날짜
-    id: "", // 디비용 id
+    created_at: '', // 디비용 날짜
+    id: uuidv4(), // 디비용 id
     updated_at: null, // 디비용 날짜
   };
 
@@ -428,100 +434,158 @@ export const handleCreateMessages = async (
     user_id: profile.user_id,
     content: generatedText,
     model: modelData.modelId,
-    role: "assistant",
+    role: 'assistant',
     sequence_number: chatMessages.length + 1,
     image_paths: [],
-    created_at: "", // 디비용 날짜
-    id: "", // 디비용 id
+    created_at: '', // 디비용 날짜
+    id: uuidv4(), // 디비용 id
     updated_at: null, // 디비용 날짜
   };
 
   let finalChatMessages: ChatMessage[] = [];
 
-  if (isRegeneration) {
-    const lastStartingMessage = chatMessages[chatMessages.length - 1].message;
+  // if (isRegeneration) {
+  //   const lastStartingMessage = chatMessages[chatMessages.length - 1].message;
 
-    const updatedMessage = await updateMessage(lastStartingMessage.id, {
-      ...lastStartingMessage,
-      content: generatedText,
-    });
+  //   const updatedMessage = await updateMessage(lastStartingMessage.id, {
+  //     ...lastStartingMessage,
+  //     content: generatedText,
+  //   });
 
-    chatMessages[chatMessages.length - 1].message = updatedMessage;
+  //   chatMessages[chatMessages.length - 1].message = updatedMessage;
 
-    finalChatMessages = [...chatMessages];
+  //   finalChatMessages = [...chatMessages];
 
-    setChatMessages(finalChatMessages);
-  } else {
-    const createdMessages = await createMessages([
-      finalUserMessage,
-      finalAssistantMessage,
-    ]);
+  //   setChatMessages(finalChatMessages);
+  // } else {
+  // const createdMessages = await createMessages([
+  //   finalUserMessage,
+  //   finalAssistantMessage,
+  // ]);
 
-    // Upload each image (stored in newMessageImages) for the user message to message_images bucket
-    const uploadPromises = newMessageImages
-      .filter((obj) => obj.file !== null)
-      .map((obj) => {
-        let filePath = `${profile.user_id}/${currentChat.id}/${
-          createdMessages[0].id
-        }/${uuidv4()}`;
+  const createdMessages = [finalUserMessage, finalAssistantMessage];
 
-        return uploadMessageImage(filePath, obj.file as File).catch((error) => {
-          console.error(`Failed to upload image at ${filePath}:`, error);
-          return null;
-        });
-      });
+  // Upload each image (stored in newMessageImages) for the user message to message_images bucket
+  // const uploadPromises = newMessageImages
+  //   .filter((obj) => obj.file !== null)
+  //   .map((obj) => {
+  //     let filePath = `${profile.user_id}/${currentChat.id}/${
+  //       createdMessages[0].id
+  //     }/${uuidv4()}`;
 
-    const paths = (await Promise.all(uploadPromises)).filter(
-      Boolean
-    ) as string[];
+  //     return uploadMessageImage(filePath, obj.file as File).catch((error) => {
+  //       console.error(`Failed to upload image at ${filePath}:`, error);
+  //       return null;
+  //     });
+  //   });
 
-    setChatImages((prevImages) => [
-      ...prevImages,
-      ...newMessageImages.map((obj, index) => ({
-        ...obj,
-        messageId: createdMessages[0].id,
-        path: paths[index],
-      })),
-    ]);
+  // const paths = (await Promise.all(uploadPromises)).filter(Boolean) as string[];
 
-    const updatedMessage = await updateMessage(createdMessages[0].id, {
-      ...createdMessages[0],
-      image_paths: paths,
-    });
+  // setChatImages((prevImages) => [
+  //   ...prevImages,
+  //   ...newMessageImages.map((obj, index) => ({
+  //     ...obj,
+  //     messageId: createdMessages[0].id,
+  //     path: paths[index],
+  //   })),
+  // ]);
 
-    const createdMessageFileItems = await createMessageFileItems(
-      retrievedFileItems.map((fileItem) => {
-        return {
-          user_id: profile.user_id,
-          message_id: createdMessages[1].id,
-          file_item_id: fileItem.id,
-        };
-      })
-    );
+  // const updatedMessage = await updateMessage(createdMessages[0].id, {
+  //   ...createdMessages[0],
+  //   image_paths: paths,
+  // });
 
-    finalChatMessages = [
-      ...chatMessages,
-      {
-        message: updatedMessage,
-        fileItems: [],
-      },
-      {
-        message: createdMessages[1],
-        fileItems: retrievedFileItems.map((fileItem) => fileItem.id),
-      },
-    ];
+  // const createdMessageFileItems = await createMessageFileItems(
+  //   retrievedFileItems.map((fileItem) => {
+  //     return {
+  //       user_id: profile.user_id,
+  //       message_id: createdMessages[1].id,
+  //       file_item_id: fileItem.id,
+  //     };
+  //   }),
+  // );
 
-    setChatFileItems((prevFileItems) => {
-      const newFileItems = retrievedFileItems.filter(
-        (fileItem) =>
-          !prevFileItems.some((prevItem) => prevItem.id === fileItem.id)
-      );
+  finalChatMessages = [
+    ...chatMessages,
+    {
+      message: createdMessages[0],
+      fileItems: [],
+    },
+    {
+      message: createdMessages[1],
+      fileItems: retrievedFileItems.map((fileItem) => fileItem.id),
+    },
+  ];
 
-      return [...prevFileItems, ...newFileItems];
-    });
+  // setChatFileItems((prevFileItems) => {
+  //   const newFileItems = retrievedFileItems.filter(
+  //     (fileItem) =>
+  //       !prevFileItems.some((prevItem) => prevItem.id === fileItem.id),
+  //   );
 
-    setChatMessages(finalChatMessages);
-  }
+  //   return [...prevFileItems, ...newFileItems];
+  // });
+
+  setChatMessages(finalChatMessages);
+  //}
+};
+
+export const handleCreateChat = async (
+  chatSettings: ChatSettings,
+  profile: Profiles,
+  selectedWorkspace: Workspaces,
+  messageContent: string,
+  selectedAssistant: Assistants,
+  //newMessageFiles: ChatFile[],
+  setSelectedChat: (selectedChat: Chats) => void,
+  chats: Chats[],
+  setChats: (chats: Chats[]) => void,
+  //setChatFiles: React.Dispatch<React.SetStateAction<ChatFile[]>>,
+) => {
+  // const createdChat = await createChat({
+  //   user_id: profile.user_id,
+  //   workspace_id: selectedWorkspace.id,
+  //   assistant_id: selectedAssistant?.id || null,
+  //   context_length: chatSettings.contextLength,
+  //   include_profile_context: chatSettings.includeProfileContext,
+  //   include_workspace_instructions: chatSettings.includeWorkspaceInstructions,
+  //   model: chatSettings.model,
+  //   name: messageContent.substring(0, 100),
+  //   prompt: chatSettings.prompt,
+  //   temperature: chatSettings.temperature,
+  //   embeddings_provider: chatSettings.embeddingsProvider,
+  // });
+  const createdChat = {
+    user_id: profile.user_id,
+    workspace_id: selectedWorkspace.id,
+    assistant_id: selectedAssistant?.id || null,
+    context_length: chatSettings.contextLength,
+    include_profile_context: chatSettings.includeProfileContext,
+    include_workspace_instructions: chatSettings.includeWorkspaceInstructions,
+    model: chatSettings.model,
+    name: messageContent.substring(0, 100),
+    prompt: chatSettings.prompt,
+    temperature: chatSettings.temperature,
+    embeddings_provider: chatSettings.embeddingsProvider,
+    created_at: '', //db
+    folder_id: '', //db
+    id: uuidv4(), //db
+    sharing: '', //db
+    updated_at: '', //db
+  };
+
+  setSelectedChat(createdChat);
+  setChats([createdChat, ...chats]);
+
+  // await createChatFiles(
+  //   newMessageFiles.map((file) => ({
+  //     user_id: profile.user_id,
+  //     chat_id: createdChat.id,
+  //     file_id: file.id,
+  //   })),
+  // );
+  // setChatFiles((prev) => [...prev, ...newMessageFiles]);
+  return createdChat;
 };
 
 // export const fetchChatResponse = async (

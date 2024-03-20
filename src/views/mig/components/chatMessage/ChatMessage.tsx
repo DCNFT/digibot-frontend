@@ -1,20 +1,14 @@
-import { Message } from '@/types';
+import { Messages } from '@/types';
 import { MessageMarkdown } from '@/views/chat/components/chatMessage/ChatMessageMarkdown';
 import classNames from 'classnames';
 import { format } from 'date-fns';
 
 type ChatMessageProps = {
-  message?: Message;
-  isLoader?: boolean;
-  isGenerating?: boolean;
-  isLastChatMessage?: boolean;
+  message?: Messages;
+  isLast?: boolean;
 };
 
-const ChatMessage = ({
-  message,
-  isGenerating,
-  isLastChatMessage,
-}: ChatMessageProps) => {
+const ChatMessage = ({ message, isLast }: ChatMessageProps) => {
   const now = new Date();
   const timeString = format(now, 'HH:mm');
   const chatMessageClass = classNames({
@@ -31,41 +25,7 @@ const ChatMessage = ({
 
   return (
     <div className="message-container">
-      <div className={chatMessageClass}>
-        {message?.role === 'user' ? (
-          <>
-            <div className="message-content">
-              {isGenerating &&
-                (message?.content.length === 0 ||
-                  message?.content === undefined) &&
-                isLastChatMessage && <div className="loader" />}
-
-              {message.content}
-            </div>
-            <img
-              src="/images/profile.jpg"
-              className="avatar bot-avatar"
-              alt=""
-            />
-          </>
-        ) : (
-          <>
-            <img
-              src="/images/profile.jpg"
-              className="avatar bot-avatar"
-              alt=""
-            />
-            <div className="message-content">
-              {isGenerating &&
-                (message?.content.length === 0 ||
-                  message?.content === undefined) &&
-                isLastChatMessage && <div className="loader" />}
-              <MessageMarkdown content={message?.content} />
-            </div>
-          </>
-        )}
-      </div>
-      <div className={chatMessageTimeClass}>{timeString}</div>
+      <div className={chatMessageClass}></div>
     </div>
   );
 };
