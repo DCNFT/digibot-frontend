@@ -5,17 +5,11 @@ import useChatStore from '@/store/useChatStoreMig';
 import { TextareaAutosize } from '@/components/ui/textareaAutosize';
 import { usePromptAndCommand } from '@/hooks/use-prompt-and-command';
 
-type ChatInputProps = {
-  handleSubmit?: (e: FormEvent) => void;
-};
-
-const ChatInput = ({ handleSubmit }: ChatInputProps) => {
-  const { chatInputRef, handleSendMessage, handleStopMessage } =
-    useChatHandler();
+const ChatInput = () => {
+  const { chatInputRef, handleSendMessage } = useChatHandler();
   const { handleInputChange } = usePromptAndCommand();
   const userInput = useChatStore((state) => state.userInput);
   const chatMessages = useChatStore((state) => state.chatMessages);
-
   const [isTyping, setIsTyping] = useState(false);
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
@@ -23,7 +17,6 @@ const ChatInput = ({ handleSubmit }: ChatInputProps) => {
     if (!isTyping && event.key === 'Enter' && !event.shiftKey) {
       console.log('[seo] enter');
       event.preventDefault();
-      // setIsPromptPickerOpen(false);
       handleSendMessage(userInput, chatMessages, false);
     }
   };
@@ -47,21 +40,8 @@ const ChatInput = ({ handleSubmit }: ChatInputProps) => {
     }
   }, [chatInputRef]);
 
-  const [isShowHiddenButton, setIsShowHiddenButton] = useState(false);
-  const handleOptionButton = (e: any) => {
-    e.preventDefault();
-    console.log('handleOptionButton');
-    setIsShowHiddenButton(!isShowHiddenButton);
-  };
-
   return (
     <div className="input-container">
-      {/* <HiddenButtons
-        isShowHiddenButton={isShowHiddenButton}
-        handleOptionButton={handleOptionButton}
-        handleSubmit={handleSubmit}
-      /> */}
-
       <TextareaAutosize
         textareaRef={chatInputRef}
         className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"

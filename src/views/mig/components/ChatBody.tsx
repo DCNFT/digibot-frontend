@@ -1,9 +1,6 @@
 import { useEffect, useRef } from 'react';
 import useChatStore from '@/store/useChatStoreMig';
-
-import { Message, Messages } from '@/types';
 import ChatMessage from '@/views/mig/components/chatMessage/ChatMessage';
-import { useChatHandler } from '@/hooks/useChatHandler';
 
 const ChatBody = () => {
   const chatMessages = useChatStore((state) => state.chatMessages);
@@ -15,13 +12,13 @@ const ChatBody = () => {
   useEffect(() => {
     scrollToBottom();
   }, [chatMessages]); // Scroll to bottom every time chatData changes
+
   // console.log(
   //   '[seo][chatbody] chatMessages',
   //   chatMessages.sort(
   //     (a, b) => a.message.sequence_number - b.message.sequence_number,
   //   ),
   // );
-
   //TypeError: Cannot assign to read only property '0' of object '[object Array]'
 
   return (

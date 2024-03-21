@@ -1,25 +1,10 @@
-// import { ChatbotUIContext } from "@/context/context";
-// import { getAssistantCollectionsByAssistantId } from "@/db/assistant-collections";
-// import { getAssistantFilesByAssistantId } from "@/db/assistant-files";
-// import { getAssistantToolsByAssistantId } from "@/db/assistant-tools";
-// import { updateChat } from "@/db/chats";
-// import { getCollectionFilesByCollectionId } from "@/db/collection-files";
-// import { deleteMessagesIncludingAndAfter } from "@/db/messages";
-// import { buildFinalMessages } from "@/lib/build-prompt";
-// import { Tables } from "@/supabase/types";
-// import { ChatMessage, ChatPayload, LLMID, ModelProvider } from "@/types";
-import { useRouter } from 'next/navigation';
-// import { useContext, useEffect, useRef } from "react";
 import {
   createTempMessages,
   handleCreateMessages,
   handleCreateChat,
   handleHostedChat,
-  // handleLocalChat,
-  // handleRetrieval,
   processResponse,
   validateChatSettings,
-  // validateChatSettings,
 } from '@/lib/chat';
 import {
   ChatMessage,
@@ -33,7 +18,6 @@ import { LLM_LIST } from '@/lib/models/llm/llm-list';
 import { useRef } from 'react';
 
 export const useChatHandler = () => {
-  const router = useRouter();
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
   const profile = useChatStore((state) => state.profile);
   const setUserInput = useChatStore((state) => state.setUserInput);
@@ -82,14 +66,14 @@ export const useChatHandler = () => {
     try {
       setUserInput('');
       setIsGenerating(true);
-      setIsPromptPickerOpen(false);
-      setIsFilePickerOpen(false);
+      // setIsPromptPickerOpen(false);
+      // setIsFilePickerOpen(false);
       setNewMessageImages([]);
 
       const newAbortController = new AbortController();
       setAbortController(newAbortController);
       console.log('[seo][handleSendMessage] chatSettings', chatSettings);
-      console.log('[sep] LLM_LIST = ', LLM_LIST);
+      // console.log('[sep] LLM_LIST = ', LLM_LIST);
       const modelData = [
         ...models.map((model) => ({
           modelId: model.model_id as LLMID,
@@ -100,8 +84,6 @@ export const useChatHandler = () => {
           imageInput: false,
         })),
         ...LLM_LIST,
-        // ...availableLocalModels,
-        // ...availableOpenRouterModels,
       ].find((llm) => llm.modelId === chatSettings?.model);
 
       console.log('[seo][handleSendMessage] modelData', modelData);
@@ -119,21 +101,6 @@ export const useChatHandler = () => {
       const b64Images = newMessageImages.map((image) => image.base64);
 
       let retrievedFileItems: FileItems[] = [];
-
-      // if (
-      //   (newMessageFiles.length > 0 || chatFiles.length > 0) &&
-      //   useRetrieval
-      // ) {
-      //   setToolInUse("retrieval");
-
-      //   retrievedFileItems = await handleRetrieval(
-      //     userInput,
-      //     newMessageFiles,
-      //     chatFiles,
-      //     chatSettings!.embeddingsProvider,
-      //     sourceCount
-      //   );
-      // }
 
       const { tempUserChatMessage, tempAssistantChatMessage } =
         createTempMessages(
@@ -157,75 +124,21 @@ export const useChatHandler = () => {
       };
       console.log('[seo] payload= ', payload);
       let generatedText = '';
-
-      // if (selectedTools.length > 0) {
-      //   setToolInUse("Tools");
-
-      //   const formattedMessages = await buildFinalMessages(
-      //     payload,
-      //     profile!,
-      //     chatImages
-      //   );
-
-      //   const response = await fetch("/api/chat/tools", {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify({
-      //       chatSettings: payload.chatSettings,
-      //       messages: formattedMessages,
-      //       selectedTools,
-      //     }),
-      //   });
-
-      //   setToolInUse("none");
-
-      //   generatedText = await processResponse(
-      //     response,
-      //     isRegeneration
-      //       ? payload.chatMessages[payload.chatMessages.length - 1]
-      //       : tempAssistantChatMessage,
-      //     true,
-      //     newAbortController,
-      //     setFirstTokenReceived,
-      //     setChatMessages,
-      //     setToolInUse
-      //   );
-      // }
-
-      // else {
-      if (modelData!.provider === 'ollama') {
-        // generatedText = await handleLocalChat(
-        //   payload,
-        //   profile!,
-        //   chatSettings!,
-        //   tempAssistantChatMessage,
-        //   isRegeneration,
-        //   newAbortController,
-        //   setIsGenerating,
-        //   setFirstTokenReceived,
-        //   setChatMessages,
-        //   setToolInUse
-        // );
-      } else {
-        generatedText = await handleHostedChat(
-          payload,
-          profile!,
-          modelData!,
-          tempAssistantChatMessage,
-          isRegeneration,
-          newAbortController,
-          newMessageImages,
-          chatImages,
-          setIsGenerating,
-          setFirstTokenReceived,
-          removeLastTwoChatMessages,
-          updateChatMessageContent,
-          setToolInUse,
-        );
-      }
-      // }
+      generatedText = await handleHostedChat(
+        payload,
+        profile!,
+        modelData!,
+        tempAssistantChatMessage,
+        isRegeneration,
+        newAbortController,
+        newMessageImages,
+        chatImages,
+        setIsGenerating,
+        setFirstTokenReceived,
+        removeLastTwoChatMessages,
+        updateChatMessageContent,
+        setToolInUse,
+      );
 
       if (!currentChat) {
         currentChat = await handleCreateChat(
@@ -269,15 +182,10 @@ export const useChatHandler = () => {
         modelData!,
         messageContent,
         generatedText,
-        newMessageImages,
-        isRegeneration,
         retrievedFileItems,
         setChatMessages,
-        // setChatFileItems,
-        // setChatImages,
         selectedAssistant,
       );
-
       setIsGenerating(false);
       setFirstTokenReceived(false);
       setUserInput('');
@@ -287,40 +195,17 @@ export const useChatHandler = () => {
       setUserInput(startingInput);
     }
   };
+
   const handleStopMessage = () => {
     if (abortController) {
       abortController.abort();
     }
   };
 
-  // const handleSendEdit = async (
-  //   editedContent: string,
-  //   sequenceNumber: number
-  // ) => {
-  //   if (!selectedChat) return;
-
-  //   await deleteMessagesIncludingAndAfter(
-  //     selectedChat.user_id,
-  //     selectedChat.id,
-  //     sequenceNumber
-  //   );
-
-  //   const filteredMessages = chatMessages.filter(
-  //     (chatMessage) => chatMessage.message.sequence_number < sequenceNumber
-  //   );
-
-  //   setChatMessages(filteredMessages);
-
-  //   handleSendMessage(editedContent, filteredMessages, false);
-  // };
-
   return {
     chatInputRef,
-    //prompt,
-    // handleNewChat,
     handleSendMessage,
     // handleFocusChatInput,
     handleStopMessage,
-    // handleSendEdit,
   };
 };

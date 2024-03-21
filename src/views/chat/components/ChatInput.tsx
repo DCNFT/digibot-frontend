@@ -31,26 +31,6 @@ const ChatInput = ({ handleSubmit }: ChatInputProps) => {
       handleSubmit(event);
       //handleSendMessage(userInput, chatMessages, false);
     }
-
-    // if (
-    //   isPromptPickerOpen &&
-    //   (event.key === 'Tab' ||
-    //     event.key === 'ArrowUp' ||
-    //     event.key === 'ArrowDown')
-    // ) {
-    //   event.preventDefault();
-    //   setFocusPrompt(!focusPrompt);
-    // }
-
-    // if (
-    //   isAtPickerOpen &&
-    //   (event.key === 'Tab' ||
-    //     event.key === 'ArrowUp' ||
-    //     event.key === 'ArrowDown')
-    // ) {
-    //   event.preventDefault();
-    //   setFocusFile(!focusFile);
-    // }
   };
   useEffect(() => {
     const textarea = chatInputRef.current;
