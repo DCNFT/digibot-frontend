@@ -35,7 +35,7 @@ export const useChatHandler = () => {
   const abortController = useChatStore((state) => state.abortController);
   const setAbortController = useChatStore((state) => state.setAbortController);
   const models = useChatStore((state) => state.models);
-  const chatSettings = useChatStore((state) => state.chatSettings);
+  //const chatSettings = useChatStore((state) => state.chatSettings);
   const chats = useChatStore((state) => state.chats);
   const setChats = useChatStore((state) => state.setChats);
   const selectedChat = useChatStore((state) => state.selectedChat);
@@ -59,6 +59,7 @@ export const useChatHandler = () => {
   const handleSendMessage = async (
     messageContent: string,
     chatMessages: ChatMessage[],
+    chatSettings: ChatSettings,
     isRegeneration: boolean,
   ) => {
     const startingInput = messageContent;
@@ -96,6 +97,7 @@ export const useChatHandler = () => {
         messageContent,
       );
 
+      console.log('[seo] selectedChat ', selectedChat);
       let currentChat = selectedChat ? { ...selectedChat } : null;
 
       const b64Images = newMessageImages.map((image) => image.base64);
@@ -141,6 +143,7 @@ export const useChatHandler = () => {
       );
 
       if (!currentChat) {
+        console.log('[seo][handleSendMessage] currentChat is null');
         currentChat = await handleCreateChat(
           chatSettings!,
           profile!,
@@ -153,7 +156,6 @@ export const useChatHandler = () => {
           setChats,
           //setChatFiles,
         );
-        console.log('[seo][handleSendMessage] currentChat', currentChat);
       } else {
         // const updatedChat = await updateChat(currentChat.id, {
         //   updated_at: new Date().toISOString(),
@@ -174,7 +176,7 @@ export const useChatHandler = () => {
         //   return updatedChats;
         // });
       }
-
+      console.log('[seo][handleSendMessage] currentChat', currentChat);
       await handleCreateMessages(
         chatMessages,
         currentChat,

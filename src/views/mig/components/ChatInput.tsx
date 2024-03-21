@@ -10,7 +10,7 @@ const ChatInput = () => {
   const userInput = useChatStore((state) => state.userInput);
   const chatMessages = useChatStore((state) => state.chatMessages);
   const [isTyping, setIsTyping] = useState(false);
-
+  const chatMessagesList = useChatStore((state) => state.chatMessagesList);
   const handleKeyDown = (event: React.KeyboardEvent) => {
     console.log('[seo] handleKeyDown');
     if (!isTyping && event.key === 'Enter' && !event.shiftKey) {

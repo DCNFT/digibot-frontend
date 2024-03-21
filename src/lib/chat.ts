@@ -417,6 +417,7 @@ export const handleCreateMessages = async (
   //setChatImages: (chatImages: MessageImage[]) => void,
   selectedAssistant: Assistants | null,
 ) => {
+  console.log('[seo][handleCreateMessages] currentChat', currentChat);
   const finalUserMessage: Messages = {
     chat_id: currentChat.id,
     assistant_id: null,
@@ -491,7 +492,7 @@ export const handleCreateChat = async (
     sharing: '', //db
     updated_at: '', //db
   };
-
+  console.log('[seo] createdChat=', createdChat);
   setSelectedChat(createdChat);
   setChats([createdChat, ...chats]);
   return createdChat;

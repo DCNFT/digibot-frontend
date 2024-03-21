@@ -1,9 +1,17 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import useChatStore from '@/store/useChatStoreMig';
 import ChatMessage from '@/views/mig/components/chatMessage/ChatMessage';
 import { ChatSettings } from '@/components/chat/chatSettings';
+import { v4 as uuidv4 } from 'uuid';
 
-const ChatBody = () => {
+type ChatBodyProps = {
+  data: any;
+};
+const ChatBody = ({ data }: ChatBodyProps) => {
+  const [chatMessageListId, setChatMessageListId] = useState(uuidv4());
+  useEffect(() => {
+    console.log('chatBody useEffect');
+  }, []);
   const chatMessages = useChatStore((state) => state.chatMessages);
   const messagesEndRef = useRef<any>(null);
   const scrollToBottom = () => {
@@ -21,9 +29,12 @@ const ChatBody = () => {
   //   ),
   // );
   //TypeError: Cannot assign to read only property '0' of object '[object Array]'
+  const chatSettings = useChatStore((state) => state.chatSettings);
+  console.log('[seo] chatSettings= ', chatSettings);
 
   return (
     <div>
+      {data?.chatSettings?.model}
       {chatMessages?.map((chatMessage, index, array) => {
         return (
           <ChatMessage

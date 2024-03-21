@@ -1,10 +1,10 @@
 // import { Tables } from '@/supabase/types';
-import { LLMID } from ".";
-import { ChatMessage } from "./chatMessage";
+import { LLMID } from '.';
+import { ChatMessage } from './chatMessage';
 
 export type Message = {
   id?: string;
-  role: "user" | "assistant" | "system";
+  role: 'user' | 'assistant' | 'system';
   content: string;
   timestamp?: string;
 };
@@ -30,7 +30,7 @@ export interface ChatSettings {
   contextLength: number;
   includeProfileContext: boolean;
   includeWorkspaceInstructions: boolean;
-  embeddingsProvider: "openai" | "local";
+  embeddingsProvider: 'openai' | 'local';
 }
 
 export interface FileItems {
@@ -144,4 +144,5 @@ export interface Chats {
   updated_at: string | null;
   user_id: string;
   workspace_id: string;
+  grid?: number;
 }

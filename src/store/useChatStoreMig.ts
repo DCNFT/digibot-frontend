@@ -1,3 +1,5 @@
+import { chatSettings } from '@/components/chatSettings';
+import { ChatMessage } from '@/views/mig/components/chatMessage/ChatMessage';
 import {
   Assistants,
   ChatFile,
@@ -29,9 +31,16 @@ type State = {
   chatSettings: ChatSettings | null;
 
   chats: Chats[];
-  selectedChat: Chats;
+  selectedChat: Chats | null;
   selectedWorkspace: Workspaces;
   chatMessages: ChatMessage[];
+  chatMessagesList: {
+    chatMessages: ChatMessage[];
+    chatId: string;
+    chatSettings: ChatSettings;
+    id: string;
+    isDisplay: boolean;
+  }[];
 
   toolInUse: string;
   firstTokenReceived: boolean;
@@ -82,7 +91,7 @@ const initialState: State = {
     embeddingsProvider: 'openai',
   },
   chats: [] as Chats[],
-  selectedChat: {} as Chats,
+  selectedChat: null,
   selectedWorkspace: {} as Workspaces,
   chatMessages: [],
   toolInUse: '',
@@ -91,6 +100,38 @@ const initialState: State = {
   chatFileItems: [],
   chatImages: [],
   chatFiles: [],
+  chatMessagesList: [
+    {
+      chatMessages: [],
+      chatId: '',
+      chatSettings: {
+        model: 'gpt-3.5-turbo' as LLMID,
+        prompt: 'You are a friendly, helpful AI assistant.',
+        temperature: 0.5,
+        contextLength: 4096,
+        includeProfileContext: true,
+        includeWorkspaceInstructions: true,
+        embeddingsProvider: 'openai',
+      },
+      id: '1',
+      isDisplay: true,
+    },
+    {
+      chatMessages: [],
+      chatId: '',
+      chatSettings: {
+        model: 'gpt-4-1106-preview' as LLMID,
+        prompt: 'You are a friendly, helpful AI assistant.',
+        temperature: 0.5,
+        contextLength: 4096,
+        includeProfileContext: true,
+        includeWorkspaceInstructions: true,
+        embeddingsProvider: 'openai',
+      },
+      id: '2',
+      isDisplay: true,
+    },
+  ],
 };
 
 const useChatStore = create(
