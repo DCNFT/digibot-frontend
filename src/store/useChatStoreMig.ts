@@ -173,6 +173,25 @@ const useChatStore = create(
             state.chatMessages[messageIndex].message.content += contentToAdd;
           }
         }),
+
+      updateChatMessageListContent: (
+        chatDataId: string,
+        messageId: string,
+        contentToAdd: string,
+      ) =>
+        set((state) => {
+          const chatMessageData = state.chatMessagesList.find(
+            (chatData) => chatData.id === chatDataId,
+          );
+
+          const message = chatMessageData?.chatMessages.find(
+            (chatMessage) => chatMessage.message.id === messageId,
+          );
+          if (message) {
+            // 직접 상태 수정. Immer가 불변성을 자동으로 처리함.
+            message.message.content += contentToAdd;
+          }
+        }),
     })),
   ),
 );

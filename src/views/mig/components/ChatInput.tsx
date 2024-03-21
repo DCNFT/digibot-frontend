@@ -5,7 +5,8 @@ import { TextareaAutosize } from '@/components/ui/textareaAutosize';
 import { usePromptAndCommand } from '@/hooks/use-prompt-and-command';
 
 const ChatInput = () => {
-  const { chatInputRef, handleSendMessage } = useChatHandler();
+  const { chatInputRef, handleSendMessage, handleMultiSendMessage } =
+    useChatHandler();
   const { handleInputChange } = usePromptAndCommand();
   const userInput = useChatStore((state) => state.userInput);
   const chatMessages = useChatStore((state) => state.chatMessages);
@@ -16,7 +17,16 @@ const ChatInput = () => {
     if (!isTyping && event.key === 'Enter' && !event.shiftKey) {
       console.log('[seo] enter');
       event.preventDefault();
-      handleSendMessage(userInput, chatMessages, false);
+      //handleSendMessage(userInput, chatMessages, false);
+      chatMessagesList.forEach((data) => {
+        handleMultiSendMessage(
+          userInput,
+          data.chatMessages,
+          data.chatSettings,
+          data.id,
+          false,
+        );
+      });
     }
   };
 

@@ -350,6 +350,7 @@ export const handleHostedChat = async (
   removeLastTwoChatMessages: () => void,
   updateChatMessageContent: (messageId: string, contentToAdd: string) => void,
   setToolInUse: (toolInUse: string) => void,
+  chatDataId?: string,
 ) => {
   const provider =
     modelData.provider === 'openai' && profile.use_azure_openai
