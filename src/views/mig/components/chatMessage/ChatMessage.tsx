@@ -1,5 +1,5 @@
 import { Messages } from '@/types';
-import { MessageMarkdown } from '@/views/chat/components/chatMessage/ChatMessageMarkdown';
+import { MessageMarkdown } from '@/views/mig/components/chatMessage/ChatMessageMarkdown';
 import classNames from 'classnames';
 import { format } from 'date-fns';
 
@@ -24,8 +24,14 @@ const ChatMessage = ({ message, isLast }: ChatMessageProps) => {
   });
 
   return (
-    <div className="message-container">
-      <div className={chatMessageClass}>{message?.content}</div>
+    <div className="flex w-full justify-center">
+      <div
+        className={
+          'relative flex w-[300px] flex-col py-6 sm:w-[400px] md:w-[500px] lg:w-[600px] xl:w-[700px]'
+        }
+      >
+        {message?.content}
+      </div>
     </div>
   );
 };

@@ -27,10 +27,12 @@ type State = {
   abortController: AbortController;
   models: Models[];
   chatSettings: ChatSettings | null;
+
   chats: Chats[];
   selectedChat: Chats;
   selectedWorkspace: Workspaces;
   chatMessages: ChatMessage[];
+
   toolInUse: string;
   firstTokenReceived: boolean;
   selectedAssistant: Assistants;

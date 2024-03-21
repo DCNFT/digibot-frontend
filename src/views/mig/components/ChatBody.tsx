@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import useChatStore from '@/store/useChatStoreMig';
 import ChatMessage from '@/views/mig/components/chatMessage/ChatMessage';
+import { ChatSettings } from '@/components/chat/chatSettings';
 
 const ChatBody = () => {
   const chatMessages = useChatStore((state) => state.chatMessages);
@@ -22,7 +23,7 @@ const ChatBody = () => {
   //TypeError: Cannot assign to read only property '0' of object '[object Array]'
 
   return (
-    <div id="chatbox">
+    <div>
       {chatMessages?.map((chatMessage, index, array) => {
         return (
           <ChatMessage

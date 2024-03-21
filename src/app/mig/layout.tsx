@@ -7,5 +7,5 @@ interface LabLayoutProps {
 }
 
 export default function LabLayout({ children }: LabLayoutProps) {
-  return <>{children}</>;
+  return <div className="flex h-full w-full">{children}</div>;
 }
