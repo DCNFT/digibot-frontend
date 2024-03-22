@@ -98,9 +98,14 @@ export const processResponse = async (
   isHosted: boolean,
   controller: AbortController,
   setFirstTokenReceived: (isFirstTokenReceived: boolean) => void,
-  // setChatMessages: (chatMessages: ChatMessage[]) => void,
   updateChatMessageContent: (messageId: string, contentToAdd: string) => void,
   setToolInUse: (toolInUse: string) => void,
+  updateChatMessageListContent?: (
+    chatDataId: string,
+    messageId: string,
+    contentToAdd: string,
+  ) => void,
+  chatDataId?: string,
 ) => {
   let fullText = '';
   let contentToAdd = '';
@@ -148,7 +153,19 @@ export const processResponse = async (
         //     return chatMessage;
         //   }),
         // );
-        updateChatMessageContent(lastChatMessage.message.id, contentToAdd);
+        //updateChatMessageContent(lastChatMessage.message.id, contentToAdd);
+        console.log(
+          '[seo]lastChatMessage ',
+          lastChatMessage,
+          chatDataId || '',
+          lastChatMessage.message.id,
+          contentToAdd,
+        );
+        updateChatMessageListContent(
+          chatDataId || '',
+          lastChatMessage.message.id,
+          contentToAdd,
+        );
       },
       controller.signal,
     );
@@ -236,6 +253,11 @@ export const createTempMessages = (
   b64Images: string[],
   isRegeneration: boolean,
   setChatMessages: (chatMessages: ChatMessage[]) => void,
+  setChatMessagesListMessages: (
+    chatDataId: string,
+    chatMessages: ChatMessage[],
+  ) => void,
+  chatDataId: string,
 ) => {
   let tempUserChatMessage: ChatMessage = {
     message: {
@@ -286,7 +308,7 @@ export const createTempMessages = (
   }
 
   setChatMessages(newMessages);
-
+  setChatMessagesListMessages(chatDataId, newMessages);
   return {
     tempUserChatMessage,
     tempAssistantChatMessage,
@@ -350,6 +372,11 @@ export const handleHostedChat = async (
   removeLastTwoChatMessages: () => void,
   updateChatMessageContent: (messageId: string, contentToAdd: string) => void,
   setToolInUse: (toolInUse: string) => void,
+  updateChatMessageListContent?: (
+    chatDataId: string,
+    messageId: string,
+    contentToAdd: string,
+  ) => void,
   chatDataId?: string,
 ) => {
   const provider =
@@ -400,6 +427,8 @@ export const handleHostedChat = async (
     setFirstTokenReceived,
     updateChatMessageContent,
     setToolInUse,
+    updateChatMessageListContent,
+    chatDataId,
   );
 };
 
@@ -475,6 +504,7 @@ export const handleCreateChat = async (
   setChats: (chats: Chats[]) => void,
   //setChatFiles: React.Dispatch<React.SetStateAction<ChatFile[]>>,
 ) => {
+  const chatId = uuidv4();
   const createdChat = {
     user_id: profile.user_id,
     workspace_id: selectedWorkspace.id,
@@ -489,7 +519,7 @@ export const handleCreateChat = async (
     embeddings_provider: chatSettings.embeddingsProvider,
     created_at: '', //db
     folder_id: '', //db
-    id: uuidv4(), //db
+    id: chatId, //db
     sharing: '', //db
     updated_at: '', //db
   };

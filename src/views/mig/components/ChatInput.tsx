@@ -19,6 +19,7 @@ const ChatInput = () => {
       event.preventDefault();
       //handleSendMessage(userInput, chatMessages, false);
       chatMessagesList.forEach((data) => {
+        console.log('[seo] data= ', data);
         handleMultiSendMessage(
           userInput,
           data.chatMessages,

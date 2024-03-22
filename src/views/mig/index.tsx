@@ -3,7 +3,6 @@ import ChatInput from './components/ChatInput';
 import useChatStore from '@/store/useChatStoreMig';
 
 const NewHome = () => {
-  const chatMessagesList = useChatStore((state) => state.chatMessagesList);
   return (
     <div className="relative flex h-full flex-col items-center">
       <div className="absolute left-4 top-2.5 flex justify-center"></div>
@@ -18,9 +17,7 @@ const NewHome = () => {
 
       <div className="flex size-full flex-col overflow-auto border-b h-full w-full">
         <div className="flex p-4 w-full">
-          {chatMessagesList.map((data, index) => (
-            <ChatBody key={index} data={data} />
-          ))}
+          <ChatBody />
         </div>
       </div>
       <div className="relative w-[300px] items-end pb-8 pt-5 sm:w-[400px] md:w-[500px] lg:w-[660px] xl:w-[800px]">

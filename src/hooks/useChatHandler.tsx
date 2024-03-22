@@ -57,6 +57,12 @@ export const useChatHandler = () => {
     (state) => state.updateChatMessageContent,
   );
 
+  const updateChatMessageListContent = useChatStore(
+    (state) => state.updateChatMessageListContent,
+  );
+  const setChatMessagesListMessages = useChatStore(
+    (state) => state.setChatMessagesListMessages,
+  );
   const handleSendMessage = async (
     messageContent: string,
     chatMessages: ChatMessage[],
@@ -255,6 +261,8 @@ export const useChatHandler = () => {
           b64Images,
           isRegeneration,
           setChatMessages,
+          setChatMessagesListMessages,
+          chatDataId,
         );
 
       let payload: ChatPayload = {
@@ -283,6 +291,8 @@ export const useChatHandler = () => {
         removeLastTwoChatMessages,
         updateChatMessageContent,
         setToolInUse,
+        updateChatMessageListContent,
+        chatDataId,
       );
 
       if (!currentChat) {

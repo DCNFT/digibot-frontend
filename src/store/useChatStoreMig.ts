@@ -1,7 +1,6 @@
-import { chatSettings } from '@/components/chatSettings';
-import { ChatMessage } from '@/views/mig/components/chatMessage/ChatMessage';
 import {
   Assistants,
+  ChatData,
   ChatFile,
   ChatMessage,
   ChatSettings,
@@ -34,14 +33,7 @@ type State = {
   selectedChat: Chats | null;
   selectedWorkspace: Workspaces;
   chatMessages: ChatMessage[];
-  chatMessagesList: {
-    chatMessages: ChatMessage[];
-    chatId: string;
-    chatSettings: ChatSettings;
-    id: string;
-    isDisplay: boolean;
-  }[];
-
+  chatMessagesList: ChatData[];
   toolInUse: string;
   firstTokenReceived: boolean;
   selectedAssistant: Assistants;
@@ -69,7 +61,16 @@ type Actions = {
   setAssistant: (selectedAssistant: Assistants) => void;
   removeLastTwoChatMessages: () => void;
   updateChatMessageContent: (messageId: string, contentToAdd: string) => void;
+  updateChatMessageListContent: (
+    chatDataId: string,
+    messageId: string,
+    contentToAdd: string,
+  ) => void;
   setChatFileItems: (chatFileItems: FileItems[]) => void;
+  setChatMessagesListMessages: (
+    chatDataId: string,
+    chatMessages: ChatMessage[],
+  ) => void;
 };
 
 const initialState: State = {
@@ -120,7 +121,7 @@ const initialState: State = {
       chatMessages: [],
       chatId: '',
       chatSettings: {
-        model: 'gpt-4-1106-preview' as LLMID,
+        model: 'gpt-4' as LLMID,
         prompt: 'You are a friendly, helpful AI assistant.',
         temperature: 0.5,
         contextLength: 4096,
@@ -183,13 +184,29 @@ const useChatStore = create(
           const chatMessageData = state.chatMessagesList.find(
             (chatData) => chatData.id === chatDataId,
           );
-
+          console.log(
+            'updateChatMessageListContent= chatMessageData',
+            chatMessageData,
+          );
           const message = chatMessageData?.chatMessages.find(
             (chatMessage) => chatMessage.message.id === messageId,
           );
+          console.log('updateChatMessageListContent= ', message);
           if (message) {
             // 직접 상태 수정. Immer가 불변성을 자동으로 처리함.
             message.message.content += contentToAdd;
+          }
+        }),
+      setChatMessagesListMessages: (
+        chatDataId: string,
+        chatMessages: ChatMessage[],
+      ) =>
+        set((state) => {
+          const chatData = state.chatMessagesList.find(
+            (chatData) => chatData.id === chatDataId,
+          );
+          if (chatData) {
+            chatData.chatMessages = chatMessages;
           }
         }),
     })),

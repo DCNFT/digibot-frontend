@@ -146,3 +146,11 @@ export interface Chats {
   workspace_id: string;
   grid?: number;
 }
+
+export type ChatData = {
+  chatMessages: ChatMessage[];
+  chatId: string;
+  chatSettings: ChatSettings;
+  id: string;
+  isDisplay: boolean;
+};
