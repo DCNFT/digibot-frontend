@@ -3,11 +3,67 @@ import useChatStore from '@/store/useChatStoreMig';
 import ChatMessage from '@/views/mig/components/chatMessage/ChatMessage';
 import { ChatSettings } from '@/components/chat/chatSettings';
 import { v4 as uuidv4 } from 'uuid';
-import { ChatData } from '@/types';
+import { ChatData, ChatMessage as TChatMessage } from '@/types';
+import { Input } from 'postcss';
+import { Button } from '@/components/ui/button';
+
+type RenderChatMessagesProps = {
+  chatMessages: TChatMessage[];
+};
+const RenderChatMessages = ({ chatMessages }: RenderChatMessagesProps) => {
+  return (
+    <div className="h-[400px] w-full overflow-auto">
+      {chatMessages.map((chatMessage, index) => {
+        return (
+          <ChatMessage
+            key={`${chatMessage.message.sequence_number}-${chatMessage.message.role}-${index}`}
+            message={chatMessage.message} // 여기서 message prop 타입에 맞게 전달합니다.
+            isLast={index === chatMessages.length - 1}
+          />
+        );
+      })}
+    </div>
+  );
+};
+
+type UserQuestionsProps = {
+  chatMessagesList: ChatData[];
+};
+
+const UserQuestions = ({ chatMessagesList }: UserQuestionsProps) => {
+  const userQuestionList = chatMessagesList.flatMap((chatData) =>
+    chatData.chatMessages
+      .filter((chatMessage) => chatMessage.message.role === 'user')
+      .map((chatMessage) => chatMessage.message),
+  );
+
+  const scrollToItem = (id: string) => {
+    const item = document.getElementById(id);
+    if (item) {
+      item.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  return (
+    <div className="flex flex-col">
+      {userQuestionList.map((question) => {
+        return (
+          <div
+            key={question?.id}
+            onClick={() => scrollToItem(question?.user_input_sequence_id ?? '')}
+          >
+            {question?.content}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
 
 type ChatBodyProps = {
   data?: ChatData;
 };
+
 const ChatBody = ({ data }: ChatBodyProps) => {
   const chatMessagesList = useChatStore((state) => state.chatMessagesList);
   const messagesEndRef = useRef<any>(null);
@@ -15,23 +71,32 @@ const ChatBody = ({ data }: ChatBodyProps) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // console.log(
-  //   '[seo][chatbody] chatMessages',
-  //   chatMessages.sort(
-  //     (a, b) => a.message.sequence_number - b.message.sequence_number,
-  //   ),
-  // );
-  //TypeError: Cannot assign to read only property '0' of object '[object Array]'
-  // const chatSettings = useChatStore((state) => state.chatSettings);
-  // console.log('[seo] chatSettings= ', chatSettings);
-
-  console.log('chatMessagesList= ', chatMessagesList);
   return (
-    <div>
-      <>
+    <div className="flex">
+      <UserQuestions chatMessagesList={chatMessagesList} />
+      <div className="grid overflow-hidden grow auto-rows-fr grid-cols-2 gap-3 mb-3">
+        {chatMessagesList.map((chatData) => {
+          return (
+            <div className="flex flex-col rounded-xl w-full" key={chatData.id}>
+              <p>{chatData?.chatSettings?.model}</p>
+              <RenderChatMessages chatMessages={chatData.chatMessages} />
+            </div>
+          );
+        })}
+      </div>
+
+      <div ref={messagesEndRef} />
+    </div>
+  );
+};
+
+export default ChatBody;
+
+{
+  /* <>
         {chatMessagesList.map((chatData) => {
           return chatData.chatMessages.map((chatMessage, index) => {
-            if (chatMessage.message.role === 'user' && index === 0) {
+            if (chatMessage.message.role === 'user') {
               return (
                 <ChatMessage
                   key={`${chatMessage.message.sequence_number}-user`}
@@ -51,10 +116,5 @@ const ChatBody = ({ data }: ChatBodyProps) => {
             }
           });
         })}
-      </>
-      <div ref={messagesEndRef} />
-    </div>
-  );
-};
-
-export default ChatBody;
+      </> */
+}

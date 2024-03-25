@@ -21,6 +21,7 @@ export type Messages = {
   sequence_number: number;
   updated_at: string | null;
   user_id: string;
+  user_input_sequence_id?: string | null; // 동일 유저 인풋 시퀸스에 해당하는 id
 };
 
 export interface ChatSettings {

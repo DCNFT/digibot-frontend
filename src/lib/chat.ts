@@ -161,11 +161,13 @@ export const processResponse = async (
           lastChatMessage.message.id,
           contentToAdd,
         );
-        updateChatMessageListContent(
-          chatDataId || '',
-          lastChatMessage.message.id,
-          contentToAdd,
-        );
+        if (updateChatMessageListContent) {
+          updateChatMessageListContent(
+            chatDataId || '',
+            lastChatMessage.message.id,
+            contentToAdd,
+          );
+        }
       },
       controller.signal,
     );
@@ -258,6 +260,7 @@ export const createTempMessages = (
     chatMessages: ChatMessage[],
   ) => void,
   chatDataId: string,
+  userInputSequenceId: string,
 ) => {
   let tempUserChatMessage: ChatMessage = {
     message: {
@@ -272,6 +275,7 @@ export const createTempMessages = (
       updated_at: '',
       user_id: '',
       assistant_id: null,
+      user_input_sequence_id: userInputSequenceId,
     },
     fileItems: [],
   };
@@ -446,6 +450,7 @@ export const handleCreateMessages = async (
   //setChatFileItems: (fileItems: FileItems[]) => void,
   //setChatImages: (chatImages: MessageImage[]) => void,
   selectedAssistant: Assistants | null,
+  userInputSequenceId: string,
 ) => {
   console.log('[seo][handleCreateMessages] currentChat', currentChat);
   const finalUserMessage: Messages = {
@@ -460,6 +465,7 @@ export const handleCreateMessages = async (
     created_at: '', // 디비용 날짜
     id: uuidv4(), // 디비용 id
     updated_at: null, // 디비용 날짜
+    user_input_sequence_id: userInputSequenceId,
   };
 
   const finalAssistantMessage: Messages = {

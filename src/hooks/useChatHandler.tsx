@@ -209,6 +209,7 @@ export const useChatHandler = () => {
     chatMessages: ChatMessage[],
     chatSettings: ChatSettings,
     chatDataId: string,
+    userInputSequenceId: string,
     isRegeneration: boolean,
   ) => {
     const startingInput = messageContent;
@@ -263,6 +264,7 @@ export const useChatHandler = () => {
           setChatMessages,
           setChatMessagesListMessages,
           chatDataId,
+          userInputSequenceId,
         );
 
       let payload: ChatPayload = {
@@ -340,6 +342,7 @@ export const useChatHandler = () => {
         retrievedFileItems,
         setChatMessages,
         selectedAssistant,
+        userInputSequenceId,
       );
       setIsGenerating(false);
       setFirstTokenReceived(false);

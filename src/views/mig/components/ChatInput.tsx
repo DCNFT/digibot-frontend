@@ -3,6 +3,7 @@ import { useChatHandler } from '@/hooks/useChatHandler';
 import useChatStore from '@/store/useChatStoreMig';
 import { TextareaAutosize } from '@/components/ui/textareaAutosize';
 import { usePromptAndCommand } from '@/hooks/use-prompt-and-command';
+import { v4 as uuidv4 } from 'uuid';
 
 const ChatInput = () => {
   const { chatInputRef, handleSendMessage, handleMultiSendMessage } =
@@ -17,6 +18,7 @@ const ChatInput = () => {
     if (!isTyping && event.key === 'Enter' && !event.shiftKey) {
       console.log('[seo] enter');
       event.preventDefault();
+      const userInputSequenceId = uuidv4();
       //handleSendMessage(userInput, chatMessages, false);
       chatMessagesList.forEach((data) => {
         console.log('[seo] data= ', data);
@@ -25,6 +27,7 @@ const ChatInput = () => {
           data.chatMessages,
           data.chatSettings,
           data.id,
+          userInputSequenceId,
           false,
         );
       });
