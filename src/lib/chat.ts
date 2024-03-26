@@ -1,5 +1,5 @@
-import { createDocXFile } from './../db/files';
-import { create } from 'zustand';
+// import { createDocXFile } from './../db/files';
+// import { create } from 'zustand';
 import {
   Assistants,
   ChatFile,
@@ -28,9 +28,9 @@ import {
   buildFinalMessages,
   buildGoogleGeminiFinalMessages,
 } from './build-prompt';
-import { createMessages, updateMessage } from '@/db/messages';
-import { uploadMessageImage } from '@/db/storage/message-images';
-import { createMessageFileItems } from '@/db/message-file-items';
+// import { createMessages, updateMessage } from '@/db/messages';
+// import { uploadMessageImage } from '@/db/storage/message-images';
+// import { createMessageFileItems } from '@/db/message-file-items';
 
 export const validateChatSettings = (
   chatSettings: ChatSettings | null,
@@ -260,7 +260,7 @@ export const createTempMessages = (
     chatMessages: ChatMessage[],
   ) => void,
   chatDataId: string,
-  userInputSequenceId: string,
+  userInputSequenceId?: string,
 ) => {
   let tempUserChatMessage: ChatMessage = {
     message: {
@@ -450,7 +450,7 @@ export const handleCreateMessages = async (
   //setChatFileItems: (fileItems: FileItems[]) => void,
   //setChatImages: (chatImages: MessageImage[]) => void,
   selectedAssistant: Assistants | null,
-  userInputSequenceId: string,
+  userInputSequenceId?: string,
 ) => {
   console.log('[seo][handleCreateMessages] currentChat', currentChat);
   const finalUserMessage: Messages = {

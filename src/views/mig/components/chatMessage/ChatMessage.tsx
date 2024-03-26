@@ -17,7 +17,7 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
         'flex w-full justify-center',
         message?.role === 'user' ? '' : 'bg-secondary',
       )}
-      id={message?.id}
+      data-id={message?.user_input_sequence_id || ''}
     >
       <div className="flex flex-col">
         {message?.model === 'gpt-3.5-turbo' ? <p>gpt-3.5</p> : <p>gpt-4</p>}

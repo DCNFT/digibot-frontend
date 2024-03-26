@@ -17,8 +17,10 @@ import {
 import useChatStore from '@/store/useChatStoreMig';
 import { LLM_LIST } from '@/lib/models/llm/llm-list';
 import { useRef } from 'react';
+import { useRouter } from 'next/navigation';
 
 export const useChatHandler = () => {
+  const router = useRouter();
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
   const profile = useChatStore((state) => state.profile);
   const setUserInput = useChatStore((state) => state.setUserInput);
@@ -63,6 +65,78 @@ export const useChatHandler = () => {
   const setChatMessagesListMessages = useChatStore(
     (state) => state.setChatMessagesListMessages,
   );
+
+  const setChatSettings = useChatStore((state) => state.setChatSettings);
+
+  const handleNewChat = () => {
+    setUserInput('');
+    setChatMessages([]);
+    setSelectedChat(null);
+    //setChatFileItems([]);
+
+    setIsGenerating(false);
+    setFirstTokenReceived(false);
+
+    //setChatFiles([]);
+    //setChatImages([]);
+    //setNewMessageFiles([]);
+    //setNewMessageImages([]);
+    //setShowFilesDisplay(false);
+    setIsPromptPickerOpen(false);
+    //setIsAtPickerOpen(false);
+
+    //setSelectedTools([]);
+    setToolInUse('none');
+
+    // if (selectedAssistant) {
+    //   setChatSettings({
+    //     model: selectedAssistant.model as LLMID,
+    //     prompt: selectedAssistant.prompt,
+    //     temperature: selectedAssistant.temperature,
+    //     contextLength: selectedAssistant.context_length,
+    //     includeProfileContext: selectedAssistant.include_profile_context,
+    //     includeWorkspaceInstructions:
+    //       selectedAssistant.include_workspace_instructions,
+    //     embeddingsProvider: selectedAssistant.embeddings_provider as
+    //       | 'openai'
+    //       | 'local',
+    //   });
+    // } else if (selectedPreset) {
+    //   setChatSettings({
+    //     model: selectedPreset.model as LLMID,
+    //     prompt: selectedPreset.prompt,
+    //     temperature: selectedPreset.temperature,
+    //     contextLength: selectedPreset.context_length,
+    //     includeProfileContext: selectedPreset.include_profile_context,
+    //     includeWorkspaceInstructions:
+    //       selectedPreset.include_workspace_instructions,
+    //     embeddingsProvider: selectedPreset.embeddings_provider as
+    //       | 'openai'
+    //       | 'local',
+    //   });
+    // } else
+
+    if (selectedWorkspace) {
+      setChatSettings({
+        model: (selectedWorkspace.default_model || 'gpt-4') as LLMID,
+        prompt:
+          selectedWorkspace.default_prompt ||
+          'You are a friendly, helpful AI assistant.',
+        temperature: selectedWorkspace.default_temperature || 0.5,
+        contextLength: selectedWorkspace.default_context_length || 4096,
+        includeProfileContext:
+          selectedWorkspace.include_profile_context || true,
+        includeWorkspaceInstructions:
+          selectedWorkspace.include_workspace_instructions || true,
+        embeddingsProvider:
+          (selectedWorkspace.embeddings_provider as 'openai' | 'local') ||
+          'openai',
+      });
+    }
+
+    router.push('/chat');
+  };
+
   const handleSendMessage = async (
     messageContent: string,
     chatMessages: ChatMessage[],
@@ -366,5 +440,6 @@ export const useChatHandler = () => {
     handleMultiSendMessage,
     // handleFocusChatInput,
     handleStopMessage,
+    handleNewChat,
   };
 };

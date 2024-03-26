@@ -132,6 +132,21 @@ const initialState: State = {
       id: '2',
       isDisplay: true,
     },
+    {
+      chatMessages: [],
+      chatId: '',
+      chatSettings: {
+        model: 'claude-2.1' as LLMID,
+        prompt: 'You are a friendly, helpful AI assistant.',
+        temperature: 0.5,
+        contextLength: 4096,
+        includeProfileContext: true,
+        includeWorkspaceInstructions: true,
+        embeddingsProvider: 'openai',
+      },
+      id: '3',
+      isDisplay: true,
+    },
   ],
 };
 

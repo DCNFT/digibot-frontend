@@ -7,3 +7,5 @@ export * from './chatMessage';
 export * from './images/assistant-image';
 export * from './images/message-image';
 export * from './images/workspace-image';
+export * from './contentType';
+export * from './sidebar-data';
