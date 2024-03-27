@@ -71,6 +71,9 @@ export const fetchChatResponse = async (
   const response = await fetch(url, {
     method: 'POST',
     body: JSON.stringify(body),
+    headers: {
+      'Content-Type': 'application/json', // Set Content-Type header
+    },
     signal: controller.signal,
   });
 
@@ -400,8 +403,10 @@ export const handleHostedChat = async (
     formattedMessages = await buildFinalMessages(payload, profile, chatImages);
   }
 
-  const apiEndpoint =
-    provider === 'custom' ? '/api/chat/custom' : `/api/chat/${provider}`;
+  // const apiEndpoint =
+  //   provider === 'custom' ? '/api/chat/custom' : `/api/chat/${provider}`;
+
+  const apiEndpoint = 'http://localhost:2020/chat_v2/claude';
 
   const requestBody = {
     chatSettings: payload.chatSettings,
